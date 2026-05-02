@@ -63,6 +63,19 @@ services:
       - tcc-network
     env_file:
       - .env  # O Docker vai injetar essas variáveis direto no container
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - tcc-network
+
+volumes:
+  ollama_data:
 
 networks:
   tcc-network:
