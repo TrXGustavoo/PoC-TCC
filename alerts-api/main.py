@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request
 import requests
 
 app = FastAPI()
+banco_de_alertas = []
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
@@ -22,7 +23,7 @@ def enviar_telegram(mensagem):
         print("✅ Mensagem processada e enviada para o Telegram!")
 
 def analisar_com_ia_local(dados_alerta):
-    url_ollama = "https://metal-rocks-sort.loca.lt//api/generate"
+    url_ollama = "https://wild-moments-grab.loca.lt/api/generate"
     # url_ollama = "http://ollama:11435/api/generate"
     
     texto_do_ataque = str(dados_alerta)[:2000]
@@ -75,6 +76,25 @@ async def recebe_alerta(request: Request):
         # Trocamos caracteres que quebram o Markdown por equivalentes seguros
         relatorio_limpo = relatorio_ia.replace("*", "").replace("_", "-").replace("`", "'").replace("[", "(").replace("]", ")")
         
+        
+        #PARA O FRONTEND 
+        alerta_para_frontend = {
+            "timestamp": data_hora + "Z",
+            "ai_analysis": relatorio_limpo,
+            "raw_data": {
+                "evento": evento,
+                "ip_origem": ip_atacante,
+                "sessao": sessao
+            }
+        }
+        # Insere sempre no topo da lista (índice 0)
+        banco_de_alertas.insert(0, alerta_para_frontend)
+        
+        # Limita a 50 alertas para a memória não estourar ao longo dos dias
+        if len(banco_de_alertas) > 50:
+            banco_de_alertas.pop()
+        
+        
         # Formatação blindada contra erros de sintaxe do Python
         mensagem_final = (
             "🚨 *HONEYPOT: RELATÓRIO DE INTELIGÊNCIA* 🚨\n\n"
@@ -93,3 +113,10 @@ async def recebe_alerta(request: Request):
         return {"status": "Processado"}
     
     return {"status": "Ignorado"}
+
+@app.get("/alerts")
+async def retorna_alertas():
+    return {
+        "total": len(banco_de_alertas),
+        "alerts": banco_de_alertas
+    }

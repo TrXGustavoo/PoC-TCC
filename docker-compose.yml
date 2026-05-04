@@ -50,6 +50,9 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     networks:
       - tcc-network
     depends_on:
@@ -75,11 +78,6 @@ services:
       - ollama_data:/root/.ollama
     networks:
       - tcc-network
-
-volumes:
-  ollama_data:
-  grafana_data:
-
   frontend:
     build: 
       context: ./frontend
@@ -93,6 +91,10 @@ volumes:
       - grafana
     networks:
       - tcc-network
+
+volumes:
+  ollama_data:
+  grafana_data:
 
 networks:
   tcc-network:
