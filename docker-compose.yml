@@ -43,6 +43,9 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -50,6 +53,31 @@ services:
       - tcc-network
     depends_on:
       - loki
+
+  alerts-api:
+    build: ./alerts-api
+    container_name: alerts-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    networks:
+      - tcc-network
+    env_file:
+      - .env  # O Docker vai injetar essas variáveis direto no container
+
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - alerts-api
+      - grafana
+    networks:
+      - tcc-network
 
 networks:
   tcc-network:
