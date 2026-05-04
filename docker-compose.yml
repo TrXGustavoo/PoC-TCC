@@ -54,6 +54,7 @@ services:
       - tcc-network
     depends_on:
       - loki
+
   alerts-api:
     build: ./alerts-api
     container_name: alerts-api
@@ -78,6 +79,20 @@ services:
 volumes:
   ollama_data:
   grafana_data:
+
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - alerts-api
+      - grafana
+    networks:
+      - tcc-network
 
 networks:
   tcc-network:

@@ -23,7 +23,7 @@ def enviar_telegram(mensagem):
 
 def analisar_com_ia_local(dados_alerta):
     url_ollama = "https://metal-rocks-sort.loca.lt//api/generate"
-    # url_ollama = "http://ollama:11434/api/generate"
+    # url_ollama = "http://ollama:11435/api/generate"
     
     texto_do_ataque = str(dados_alerta)[:2000]
     

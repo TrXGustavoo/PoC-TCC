@@ -3,11 +3,11 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copia as dependências e instala
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir -r ./requirements.txt
 
 # Copia o código da API
-COPY main.py .
+COPY ./main.py .
 
 # Expõe a porta que o FastAPI usa
 EXPOSE 5000
