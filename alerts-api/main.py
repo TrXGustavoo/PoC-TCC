@@ -22,7 +22,9 @@ def enviar_telegram(mensagem):
         print("✅ Mensagem processada e enviada para o Telegram!")
 
 def analisar_com_ia_local(dados_alerta):
-    url_ollama = "http://ollama:11434/api/generate"
+    url_ollama = "https://metal-rocks-sort.loca.lt//api/generate"
+    # url_ollama = "http://ollama:11434/api/generate"
+    
     texto_do_ataque = str(dados_alerta)[:2000]
     
     prompt = f"""
@@ -37,7 +39,7 @@ def analisar_com_ia_local(dados_alerta):
     """
     
     payload = {
-        "model": "llama3.2:1b",
+        "model": "llama3",
         "prompt": prompt,
         "stream": False
     }

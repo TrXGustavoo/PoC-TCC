@@ -6,6 +6,7 @@ alerts-api/.env
 cowrie/var/log/cowrie/*.json
 cowrie/var/log/cowrie/*.log
 cowrie/var/log/cowrie/tty/
+cowrie\var\log\cowrie\cowrie.json
 
 # Dados do banco do Loki (Evitar repositórios gigantes)
 loki/chunks/
@@ -18,3 +19,6 @@ alerts-api/__pycache__/
 
 # Mac/Linux OS files
 .DS_Store
+
+grafana_data/
+cowrie/var/log/cowrie/cowrie.json

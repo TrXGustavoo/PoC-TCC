@@ -40,12 +40,13 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
+    user: root
     restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana_data:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -65,10 +66,10 @@ services:
       - .env  # O Docker vai injetar essas variáveis direto no container
   ollama:
     image: ollama/ollama:latest
-    container_name: ollama
+    container_name: ollama_tcc
     restart: unless-stopped
     ports:
-      - "11434:11434"
+      - "11435:11434"
     volumes:
       - ollama_data:/root/.ollama
     networks:
@@ -76,6 +77,7 @@ services:
 
 volumes:
   ollama_data:
+  grafana_data:
 
 networks:
   tcc-network:
