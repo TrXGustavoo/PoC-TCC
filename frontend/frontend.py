@@ -139,12 +139,12 @@ else:
 
 st.divider()
 
-# 👇 EMBED DO GRAFANA 👇
+# EMBED DO GRAFANA 
 st.subheader("📊 Observabilidade em Tempo Real (Grafana)")
 st.markdown("Visualização direta do cluster de logs e métricas.")
 
 # Usamos localhost porque quem renderiza essa parte é o navegador do usuário
-GRAFANA_URL = "http://localhost:3000/?orgId=1&kiosk" 
+GRAFANA_URL = "http://localhost:3000/goto/eflrckk7a641sa?orgId=1" 
 
 # Cria a janela embutida na tela
 components.iframe(GRAFANA_URL, height=800, scrolling=True)

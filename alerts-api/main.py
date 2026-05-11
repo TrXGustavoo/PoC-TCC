@@ -23,8 +23,8 @@ def enviar_telegram(mensagem):
         print("✅ Mensagem processada e enviada para o Telegram!")
 
 def analisar_com_ia_local(dados_alerta):
-    url_ollama = "https://wild-moments-grab.loca.lt/api/generate"
-    # url_ollama = "http://ollama:11435/api/generate"
+    url_ollama = os.getenv("OLLAMA_URL", "http://ollama_tcc:11434/api/generate")
+    nome_modelo = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
     
     texto_do_ataque = str(dados_alerta)[:2000]
     
@@ -40,7 +40,7 @@ def analisar_com_ia_local(dados_alerta):
     """
     
     payload = {
-        "model": "llama3",
+        "model": nome_modelo,
         "prompt": prompt,
         "stream": False
     }
@@ -49,7 +49,8 @@ def analisar_com_ia_local(dados_alerta):
         resposta = requests.post(url_ollama, json=payload, timeout=300)
         if resposta.status_code == 200:
             return resposta.json().get("response", "Erro: Resposta vazia.")
-        return f"❌ Erro no Ollama: {resposta.status_code}"
+        return f"❌ Erro no Ollama ({resposta.status_code}): {resposta.text}"
+        
     except Exception as e:
         return f"❌ Erro de conexão com a IA Local: {e}"
 
@@ -72,12 +73,10 @@ async def recebe_alerta(request: Request):
         
         relatorio_ia = analisar_com_ia_local(alerta_atual)
         
-        # BLINDAGEM DO TELEGRAM: Limpando a sujeira do LLM
-        # Trocamos caracteres que quebram o Markdown por equivalentes seguros
+        # Blindagem do Telegram contra caracteres especiais do LLM
         relatorio_limpo = relatorio_ia.replace("*", "").replace("_", "-").replace("`", "'").replace("[", "(").replace("]", ")")
         
-        
-        #PARA O FRONTEND 
+        # --- 1. REGISTRO NO FRONTEND (Ocorre para todos os alertas) ---
         alerta_para_frontend = {
             "timestamp": data_hora + "Z",
             "ai_analysis": relatorio_limpo,
@@ -87,29 +86,36 @@ async def recebe_alerta(request: Request):
                 "sessao": sessao
             }
         }
-        # Insere sempre no topo da lista (índice 0)
         banco_de_alertas.insert(0, alerta_para_frontend)
-        
-        # Limita a 50 alertas para a memória não estourar ao longo dos dias
         if len(banco_de_alertas) > 50:
             banco_de_alertas.pop()
         
+        # --- 2. FILTRO DE EVENTOS CRÍTICOS PARA O TELEGRAM ---
+        # Definimos quais IDs de evento do Cowrie justificam uma notificação push
+        eventos_criticos = [
+            "cowrie.command.input",        # Execução de comandos no shell
+            "cowrie.login.success",        # Invasor acertou a senha e entrou
+            "cowrie.session.file_download" # Tentativa de baixar malware/scripts
+        ]
         
-        # Formatação blindada contra erros de sintaxe do Python
-        mensagem_final = (
-            "🚨 *HONEYPOT: RELATÓRIO DE INTELIGÊNCIA* 🚨\n\n"
-            "💻 *DADOS DO ATAQUE (RAW):*\n"
-            "```text\n"
-            f"Data/Hora: {data_hora}Z\n"
-            f"Evento: {evento}\n"
-            f"IP Origem: {ip_atacante}\n"
-            f"Sessão: {sessao}\n"
-            "```\n\n"
-            "🤖 *ANÁLISE COGNITIVA (OLLAMA):*\n"
-            f"{relatorio_limpo}"
-        )
-        
-        enviar_telegram(mensagem_final)
+        if evento in eventos_criticos:
+            mensagem_final = (
+                "🚨 *HONEYPOT: RELATÓRIO DE INTELIGÊNCIA* 🚨\n\n"
+                "💻 *DADOS DO ATAQUE (RAW):*\n"
+                "```text\n"
+                f"Data/Hora: {data_hora}Z\n"
+                f"Evento: {evento}\n"
+                f"IP Origem: {ip_atacante}\n"
+                f"Sessão: {sessao}\n"
+                "```\n\n"
+                "🤖 *ANÁLISE COGNITIVA (OLLAMA):*\n"
+                f"{relatorio_limpo}"
+            )
+            enviar_telegram(mensagem_final)
+            print(f"🔥 Alerta crítico ({evento}) enviado ao Telegram.")
+        else:
+            print(f"ℹ️ Evento informativo ({evento}) registrado apenas no Frontend.")
+
         return {"status": "Processado"}
     
     return {"status": "Ignorado"}
