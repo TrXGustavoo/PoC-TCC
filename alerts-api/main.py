@@ -18,9 +18,9 @@ def enviar_telegram(mensagem):
     
     resposta = requests.post(url, json=payload)
     if resposta.status_code != 200:
-        print(f"❌ Erro no Telegram ({resposta.status_code}): {resposta.text}")
+        print(f" Erro no Telegram ({resposta.status_code}): {resposta.text}")
     else:
-        print("✅ Mensagem processada e enviada para o Telegram!")
+        print(" Mensagem processada e enviada para o Telegram!")
 
 def analisar_com_ia_local(dados_alerta):
     url_ollama = os.getenv("OLLAMA_URL", "http://ollama_tcc:11434/api/generate")
@@ -73,7 +73,7 @@ async def recebe_alerta(request: Request):
         
         relatorio_ia = analisar_com_ia_local(alerta_atual)
         
-        # Blindagem do Telegram contra caracteres especiais do LLM
+
         relatorio_limpo = relatorio_ia.replace("*", "").replace("_", "-").replace("`", "'").replace("[", "(").replace("]", ")")
         
         # --- 1. REGISTRO NO FRONTEND (Ocorre para todos os alertas) ---
@@ -91,11 +91,10 @@ async def recebe_alerta(request: Request):
             banco_de_alertas.pop()
         
         # --- 2. FILTRO DE EVENTOS CRÍTICOS PARA O TELEGRAM ---
-        # Definimos quais IDs de evento do Cowrie justificam uma notificação push
         eventos_criticos = [
-            "cowrie.command.input",        # Execução de comandos no shell
-            "cowrie.login.success",        # Invasor acertou a senha e entrou
-            "cowrie.session.file_download" # Tentativa de baixar malware/scripts
+            "cowrie.command.input",        
+            "cowrie.login.success",        
+            "cowrie.session.file_download" 
         ]
         
         if evento in eventos_criticos:

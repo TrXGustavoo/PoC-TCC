@@ -20,5 +20,5 @@ alerts-api/__pycache__/
 # Mac/Linux OS files
 .DS_Store
 
-grafana_data/
+# grafana_data/
 cowrie/var/log/cowrie/cowrie.json

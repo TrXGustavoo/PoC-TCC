@@ -29,7 +29,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./promtail/promtail-config.yaml:/etc/promtail/config.yml
-      # Mapeando o log do Cowrie para o Promtail conseguir ler
       - ./cowrie/var/log/cowrie:/var/log/cowrie
     command: -config.file=/etc/promtail/config.yml
     networks:
