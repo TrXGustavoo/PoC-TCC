@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request
 import requests
 
 app = FastAPI()
+banco_de_alertas = []
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
@@ -17,13 +18,13 @@ def enviar_telegram(mensagem):
     
     resposta = requests.post(url, json=payload)
     if resposta.status_code != 200:
-        print(f"❌ Erro no Telegram ({resposta.status_code}): {resposta.text}")
+        print(f" Erro no Telegram ({resposta.status_code}): {resposta.text}")
     else:
-        print("✅ Mensagem processada e enviada para o Telegram!")
+        print(" Mensagem processada e enviada para o Telegram!")
 
 def analisar_com_ia_local(dados_alerta):
-    url_ollama = "https://metal-rocks-sort.loca.lt//api/generate"
-    # url_ollama = "http://ollama:11435/api/generate"
+    url_ollama = os.getenv("OLLAMA_URL", "http://ollama_tcc:11434/api/generate")
+    nome_modelo = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
     
     texto_do_ataque = str(dados_alerta)[:2000]
     
@@ -39,7 +40,7 @@ def analisar_com_ia_local(dados_alerta):
     """
     
     payload = {
-        "model": "llama3",
+        "model": nome_modelo,
         "prompt": prompt,
         "stream": False
     }
@@ -48,7 +49,8 @@ def analisar_com_ia_local(dados_alerta):
         resposta = requests.post(url_ollama, json=payload, timeout=300)
         if resposta.status_code == 200:
             return resposta.json().get("response", "Erro: Resposta vazia.")
-        return f"❌ Erro no Ollama: {resposta.status_code}"
+        return f"❌ Erro no Ollama ({resposta.status_code}): {resposta.text}"
+        
     except Exception as e:
         return f"❌ Erro de conexão com a IA Local: {e}"
 
@@ -71,25 +73,55 @@ async def recebe_alerta(request: Request):
         
         relatorio_ia = analisar_com_ia_local(alerta_atual)
         
-        # BLINDAGEM DO TELEGRAM: Limpando a sujeira do LLM
-        # Trocamos caracteres que quebram o Markdown por equivalentes seguros
+
         relatorio_limpo = relatorio_ia.replace("*", "").replace("_", "-").replace("`", "'").replace("[", "(").replace("]", ")")
         
-        # Formatação blindada contra erros de sintaxe do Python
-        mensagem_final = (
-            "🚨 *HONEYPOT: RELATÓRIO DE INTELIGÊNCIA* 🚨\n\n"
-            "💻 *DADOS DO ATAQUE (RAW):*\n"
-            "```text\n"
-            f"Data/Hora: {data_hora}Z\n"
-            f"Evento: {evento}\n"
-            f"IP Origem: {ip_atacante}\n"
-            f"Sessão: {sessao}\n"
-            "```\n\n"
-            "🤖 *ANÁLISE COGNITIVA (OLLAMA):*\n"
-            f"{relatorio_limpo}"
-        )
+        # --- 1. REGISTRO NO FRONTEND (Ocorre para todos os alertas) ---
+        alerta_para_frontend = {
+            "timestamp": data_hora + "Z",
+            "ai_analysis": relatorio_limpo,
+            "raw_data": {
+                "evento": evento,
+                "ip_origem": ip_atacante,
+                "sessao": sessao
+            }
+        }
+        banco_de_alertas.insert(0, alerta_para_frontend)
+        if len(banco_de_alertas) > 50:
+            banco_de_alertas.pop()
         
-        enviar_telegram(mensagem_final)
+        # --- 2. FILTRO DE EVENTOS CRÍTICOS PARA O TELEGRAM ---
+        eventos_criticos = [
+            "cowrie.command.input",        
+            "cowrie.login.success",        
+            "cowrie.session.file_download" 
+        ]
+        
+        if evento in eventos_criticos:
+            mensagem_final = (
+                "🚨 *HONEYPOT: RELATÓRIO DE INTELIGÊNCIA* 🚨\n\n"
+                "💻 *DADOS DO ATAQUE (RAW):*\n"
+                "```text\n"
+                f"Data/Hora: {data_hora}Z\n"
+                f"Evento: {evento}\n"
+                f"IP Origem: {ip_atacante}\n"
+                f"Sessão: {sessao}\n"
+                "```\n\n"
+                "🤖 *ANÁLISE COGNITIVA (OLLAMA):*\n"
+                f"{relatorio_limpo}"
+            )
+            enviar_telegram(mensagem_final)
+            print(f"🔥 Alerta crítico ({evento}) enviado ao Telegram.")
+        else:
+            print(f"ℹ️ Evento informativo ({evento}) registrado apenas no Frontend.")
+
         return {"status": "Processado"}
     
     return {"status": "Ignorado"}
+
+@app.get("/alerts")
+async def retorna_alertas():
+    return {
+        "total": len(banco_de_alertas),
+        "alerts": banco_de_alertas
+    }

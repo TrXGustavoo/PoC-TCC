@@ -29,7 +29,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./promtail/promtail-config.yaml:/etc/promtail/config.yml
-      # Mapeando o log do Cowrie para o Promtail conseguir ler
       - ./cowrie/var/log/cowrie:/var/log/cowrie
     command: -config.file=/etc/promtail/config.yml
     networks:
@@ -50,6 +49,9 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     networks:
       - tcc-network
     depends_on:
@@ -64,7 +66,7 @@ services:
     networks:
       - tcc-network
     env_file:
-      - .env  # O Docker vai injetar essas variáveis direto no container
+      - .env 
   ollama:
     image: ollama/ollama:latest
     container_name: ollama_tcc
@@ -75,11 +77,6 @@ services:
       - ollama_data:/root/.ollama
     networks:
       - tcc-network
-
-volumes:
-  ollama_data:
-  grafana_data:
-
   frontend:
     build: 
       context: ./frontend
@@ -93,6 +90,10 @@ volumes:
       - grafana
     networks:
       - tcc-network
+
+volumes:
+  ollama_data:
+  grafana_data:
 
 networks:
   tcc-network:
