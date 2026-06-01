@@ -91,6 +91,42 @@ services:
     networks:
       - tcc-network
 
+  # TÚNEL 1: O Painel Principal (Frontend Streamlit)
+  ngrok-frontend:
+      image: ngrok/ngrok:latest
+      container_name: ngrok-frontend
+      restart: unless-stopped
+      environment:
+        - NGROK_AUTHTOKEN=3CN8gEwSvjAUlit4UG1PZ4YTCeC_2GaFz4sstrPEyWyY3dTfU
+      command:
+        - "http"
+        - "frontend:8501"
+      ports:
+        - "4040:4040" # Painel local do Ngrok 1
+      networks:
+        - tcc-network 
+      depends_on:
+        - frontend
+        - ngrok-grafana
+
+  # TÚNEL 2: O Iframe Oculto (Grafana)
+  ngrok-grafana:
+    image: ngrok/ngrok:latest
+    container_name: ngrok-grafana
+    restart: unless-stopped
+    environment:
+      - NGROK_AUTHTOKEN=3EXYZ0tlCDHieF0dvDUEFDT2sDn_6FXC9TFFC2GsZZG4jpzdK
+    command:
+      - "http"
+      - "grafana:3000"
+    ports:
+      - "4041:4040" # Painel local do Ngrok 2
+      
+    networks:
+      - tcc-network 
+    depends_on:
+      - grafana
+
 volumes:
   ollama_data:
   grafana_data:

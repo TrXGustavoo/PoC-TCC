@@ -11,12 +11,10 @@ st.set_page_config(page_title="SOC - Threat Intelligence", layout="wide", page_i
 
 st.markdown("""
     <style>
-    .stApp { background-color: #0E1117; }
-    .titulo { color: #00FFAA; font-family: 'Courier New', Courier, monospace; }
-    .ai-report { background-color: #1E1E1E; padding: 15px; border-radius: 10px; border-left: 5px solid #00FFAA; margin-bottom: 20px;}
+    .titulo { font-family: 'Courier New', Courier, monospace; }
+    .ai-report { padding: 15px; border-radius: 10px; border-left: 5px solid #00FFAA; margin-bottom: 20px;}
     </style>
 """, unsafe_allow_html=True)
-
 st.markdown("<h1 class='titulo'>🛡️ Portal de Threat Intelligence - IoT</h1>", unsafe_allow_html=True)
 st.markdown("*Monitoramento Ativo de Honeypots Embarcados (Cowrie)*")
 st.divider()
@@ -73,6 +71,7 @@ st.subheader("📊 Observabilidade em Tempo Real (Grafana)")
 st.markdown("Visualização direta do cluster de logs e métricas.")
 
 
-GRAFANA_URL = "http://localhost:3000/goto/eflrckk7a641sa?orgId=1" 
+# GRAFANA_URL = "http://localhost:3000/goto/eflrckk7a641sa?orgId=1" 
+GRAFANA_URL = "https://bakery-onscreen-vocally.ngrok-free.dev/d/adrd62h/linha-do-tempo-de-ataques?orgId=1&kiosk"
 
 components.iframe(GRAFANA_URL, height=800, scrolling=True)
