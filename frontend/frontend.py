@@ -72,6 +72,8 @@ st.markdown("Visualização direta do cluster de logs e métricas.")
 
 
 # GRAFANA_URL = "http://localhost:3000/goto/eflrckk7a641sa?orgId=1" 
-GRAFANA_URL = "https://bakery-onscreen-vocally.ngrok-free.dev/d/adrd62h/linha-do-tempo-de-ataques?orgId=1&kiosk"
+# GRAFANA_URL = "https://bakery-onscreen-vocally.ngrok-free.dev/d/adrd62h/linha-do-tempo-de-ataques?orgId=1&kiosk"
+
+GRAFANA_URL = "http://100.104.128.9:3000/d/adrd62h/linha-do-tempo-de-ataques?orgId=1&kiosk"
 
 components.iframe(GRAFANA_URL, height=800, scrolling=True)
