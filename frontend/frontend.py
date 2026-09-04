@@ -147,9 +147,10 @@ def fetch_firewall_rules(formato: str = "ufw"):
 # ==========================================
 # ESTRUTURAÇÃO DAS ABAS DO SISTEMA
 # ==========================================
-tab_alerts, tab_iocs, tab_chat, tab_grafana = st.tabs([
+tab_alerts, tab_iocs, tab_malware, tab_chat, tab_grafana = st.tabs([
     "🚨 Feed Tático de Incidentes",
     "🛡️ Inteligência de IoCs & Resposta Ativa",
+    "🦠 Análise de Malwares & Hashes (Threat Intel)",
     "🤖 Assistente Investigativo (RAG SOC)",
     "📊 Observabilidade em Tempo Real (Grafana)"
 ])
@@ -398,13 +399,12 @@ with tab_iocs:
         st.divider()
 
         # ----------------------------------------------------
-        # SEÇÃO 2: DICIONÁRIO DE CREDENCIAIS, COMANDOS & MALWARES
+        # SEÇÃO 2: DICIONÁRIO DE CREDENCIAIS & COMANDOS FORENSES
         # ----------------------------------------------------
-        st.markdown("#### 🔍 2. Auditoria Forense: Credenciais, Comandos e Binários Maliciosos")
-        tab_sub_creds, tab_sub_cmds, tab_sub_malware = st.tabs([
+        st.markdown("#### 🔍 2. Auditoria Forense: Credenciais e Comandos Interceptados")
+        tab_sub_creds, tab_sub_cmds = st.tabs([
             "🔑 Dicionário de Força Bruta (Credential Stuffing)",
-            "💻 Comandos Digitados no Terminal (Payloads)",
-            "🦠 Malware & Hashes SHA-256 (Threat Intel & VirusTotal)"
+            "💻 Comandos Digitados no Terminal (Payloads)"
         ])
 
         with tab_sub_creds:
@@ -437,47 +437,6 @@ with tab_iocs:
                         "Data/Hora": cmd.get("timestamp", "N/A")
                     })
                 st.dataframe(pd.DataFrame(cmds_df_data), use_container_width=True, hide_index=True)
-
-        with tab_sub_malware:
-            malwares_list = iocs_data.get("malwares", [])
-            if not malwares_list:
-                st.info("Nenhum binário malicioso ou tentativa de download interceptada até o momento.")
-            else:
-                malwares_df_data = []
-                for m in malwares_list:
-                    malwares_df_data.append({
-                        "Severidade": f"🚨 {m.get('severidade')}" if m.get('severidade') == "CRÍTICO" else f"⚠️ {m.get('severidade')}",
-                        "Família / Botnet": m.get("familia"),
-                        "Arquivo / Payload": m.get("arquivo"),
-                        "Arquitetura": m.get("arquitetura"),
-                        "Veredito": m.get("veredito"),
-                        "Hash SHA-256": m.get("shasum"),
-                        "IP Atacante": m.get("ip_atacante"),
-                        "Data/Hora": m.get("timestamp", "N/A")
-                    })
-                st.dataframe(pd.DataFrame(malwares_df_data), use_container_width=True, hide_index=True)
-
-                st.markdown("##### 🔬 Investigação Aprofundada & Reputação Externa (Threat Intel Feed)")
-                for m in malwares_list:
-                    hash_short = m.get("shasum", "")[:16]
-                    with st.expander(f"🦠 {m.get('familia')} - `{m.get('arquivo')}` ({hash_short}...)"):
-                        col_m_desc, col_m_links = st.columns([2, 1])
-                        with col_m_desc:
-                            st.markdown(f"**Descrição da Ameaça:** {m.get('descricao')}")
-                            st.markdown(f"**Arquitetura Alvo:** `{m.get('arquitetura')}` | **Veredito:** `{m.get('veredito')}`")
-                            st.markdown(f"**Origem do Download:** `{m.get('url_origem')}`")
-                            st.markdown(f"**IP Atacante:** `{m.get('ip_atacante')}` | **Sessão Cowrie:** `{m.get('session')}`")
-                            st.markdown(f"**Origem dos Dados:** `{m.get('origem', 'Cowrie Honeypot')}`")
-                            st.markdown("**Hash SHA-256 Completo:**")
-                            st.code(m.get("shasum"), language="text")
-                        with col_m_links:
-                            st.markdown("###### 🌐 Consultas Externas:")
-                            vt_url = m.get("virustotal_url")
-                            mb_url = m.get("malwarebazaar_url")
-                            if vt_url:
-                                st.link_button("🛡️ Consultar no VirusTotal", vt_url, use_container_width=True)
-                            if mb_url:
-                                st.link_button("🧪 Consultar no MalwareBazaar", mb_url, use_container_width=True)
 
         st.divider()
 
@@ -558,7 +517,158 @@ with tab_iocs:
             )
 
 # ==============================================================================
-# ABA 3: CHATBOT INVESTIGATIVO FORENSE (RAG SOC)
+# ABA 3: ANÁLISE DE MALWARES, HASHES SHA-256 E THREAT INTEL
+# ==============================================================================
+with tab_malware:
+    st.markdown("### 🦠 Inteligência de Binários, Malwares & Assinaturas SHA-256")
+    st.markdown(
+        "Identificação e classificação de binários maliciosos, botnets IoT e scripts capturados no honeypot. "
+        "O motor do SOC calcula hashes criptográficos **SHA-256**, classifica a taxonomia das ameaças "
+        "e correlaciona os artefatos com feeds globais de reputação (**VirusTotal** e **MalwareBazaar**)."
+    )
+
+    malware_data = fetch_iocs()
+
+    # Métricas superiores da aba de Malware
+    col_mw1, col_mw2, col_mw3, col_mw4, col_mw5 = st.columns([1.5, 1.5, 1.5, 1.5, 1])
+
+    if malware_data is not None:
+        malwares_list = malware_data.get("malwares", [])
+        total_malwares = len(malwares_list)
+        familias_unicas = len(set(m.get("familia") for m in malwares_list if m.get("familia")))
+        arquiteturas = len(set(m.get("arquitetura") for m in malwares_list if m.get("arquitetura")))
+        tem_critico = any(m.get("severidade") == "CRÍTICO" for m in malwares_list)
+
+        col_mw1.metric("Binários / Payloads", total_malwares, "Artefatos Capturados")
+        col_mw2.metric("Famílias / Botnets", familias_unicas, "Mirai, Droppers, etc.")
+        col_mw3.metric("Arquiteturas Alvo", arquiteturas, "ARM, MIPS, x86_64")
+        col_mw4.metric("Nível de Criticidade", "CRÍTICO 🚨" if tem_critico else "ALTO ⚠️", "Risco de Execução")
+    else:
+        malwares_list = []
+        col_mw1.metric("Binários / Payloads", "-", "-")
+        col_mw2.metric("Famílias / Botnets", "-", "-")
+        col_mw3.metric("Arquiteturas Alvo", "-", "-")
+        col_mw4.metric("Nível de Criticidade", "Desconhecido", "-")
+
+    with col_mw5:
+        st.write("")
+        if st.button("🔄 Atualizar Malwares", key="btn_refresh_malware_tab", use_container_width=True):
+            st.rerun()
+
+    st.divider()
+
+    if malware_data is None:
+        st.error(f"Não foi possível obter dados de malware da API em `{IOCS_ENDPOINT}`. Verifique a conectividade com o backend.")
+    elif not malwares_list:
+        st.info("Nenhum binário malicioso ou tentativa de download interceptada até o momento.")
+    else:
+        # ----------------------------------------------------
+        # SEÇÃO 1: TABELA TÁTICA DE MALWARES
+        # ----------------------------------------------------
+        st.markdown("#### 📑 1. Inventário Tático de Binários e Payloads Capturados")
+
+        col_mf1, col_mf2 = st.columns([3, 1])
+        with col_mf1:
+            filtro_mw = st.text_input("Filtrar por nome de arquivo, família ou hash:", placeholder="Ex: mirai, authorized_keys, e3b0c442...", key="filter_malware_input")
+        with col_mf2:
+            familias_opcoes = ["Todas"] + sorted(list(set(m.get("familia") for m in malwares_list if m.get("familia"))))
+            filtro_fam = st.selectbox("Família / Botnet:", familias_opcoes, key="filter_malware_fam")
+
+        malwares_filtrados = []
+        for m in malwares_list:
+            str_repr = f"{m.get('arquivo')} {m.get('familia')} {m.get('shasum')} {m.get('ip_atacante')}".lower()
+            match_txt = not filtro_mw or filtro_mw.lower() in str_repr
+            match_fam = filtro_fam == "Todas" or m.get("familia") == filtro_fam
+            if match_txt and match_fam:
+                malwares_filtrados.append(m)
+
+        if malwares_filtrados:
+            df_mw = []
+            for m in malwares_filtrados:
+                df_mw.append({
+                    "Severidade": f"🚨 {m.get('severidade')}" if m.get('severidade') == "CRÍTICO" else f"⚠️ {m.get('severidade')}",
+                    "Família / Botnet": m.get("familia"),
+                    "Arquivo / Payload": m.get("arquivo"),
+                    "Arquitetura": m.get("arquitetura"),
+                    "Veredito Forense": m.get("veredito"),
+                    "Hash SHA-256": m.get("shasum"),
+                    "IP Atacante": m.get("ip_atacante"),
+                    "Data/Hora": m.get("timestamp", "N/A")
+                })
+            st.dataframe(pd.DataFrame(df_mw), use_container_width=True, hide_index=True)
+        else:
+            st.caption("Nenhum artefato corresponde aos filtros selecionados.")
+
+        st.divider()
+
+        # ----------------------------------------------------
+        # SEÇÃO 2: INVESTIGAÇÃO FORENSE & FEEDS EXTERNOS (VIRUSTOTAL / MALWAREBAZAAR)
+        # ----------------------------------------------------
+        st.markdown("#### 🔬 2. Análise Forense Detalhada & Integração Threat Intel")
+        st.markdown("Consulte os metadados técnicos de cada artefato e acesse relatórios de inteligência globais com um clique:")
+
+        for m in malwares_filtrados:
+            hash_short = m.get("shasum", "")[:16]
+            nome_amigavel = m.get("arquivo", "payload")
+            with st.expander(f"🦠 {m.get('familia')} — `{nome_amigavel}` (SHA-256: {hash_short}...)", expanded=False):
+                col_info, col_links = st.columns([2.2, 1])
+                with col_info:
+                    st.markdown(f"**Descrição Técnica:** {m.get('descricao')}")
+                    st.markdown(f"**Arquitetura Alvo:** `{m.get('arquitetura')}` | **Veredito:** `{m.get('veredito')}`")
+                    st.markdown(f"**Origem do Download / Comando:** `{m.get('url_origem')}`")
+                    st.markdown(f"**IP de Origem do Atacante:** `{m.get('ip_atacante')}` | **Sessão Cowrie:** `{m.get('session')}`")
+                    st.markdown(f"**Data e Hora da Captura:** `{m.get('timestamp')}`")
+                    st.markdown("**Assinatura Criptográfica SHA-256 Completa:**")
+                    st.code(m.get("shasum"), language="text")
+
+                with col_links:
+                    st.markdown("###### 🌐 Consulta em Bases Globais:")
+                    vt_url = m.get("virustotal_url")
+                    mb_url = m.get("malwarebazaar_url")
+                    if vt_url:
+                        st.link_button("🛡️ Abrir no VirusTotal", vt_url, use_container_width=True)
+                    if mb_url:
+                        st.link_button("🧪 Abrir no MalwareBazaar", mb_url, use_container_width=True)
+
+                    st.write("")
+                    st.caption("🔍 *Dica Forense:* O VirusTotal permite verificar se o hash já foi associado a campanhas de APTs conhecidas.")
+
+        st.divider()
+
+        # ----------------------------------------------------
+        # SEÇÃO 3: EXPORTAÇÃO DIRETA DE HASHES PARA EDR / SIEM
+        # ----------------------------------------------------
+        st.markdown("#### 📦 3. Exportador de Hashes SHA-256 para Defesa de Endpoint (EDR)")
+        st.markdown(
+            "Exporte a lista de hashes SHA-256 dos artefatos capturados para criar regras de bloqueio "
+            "em soluções de EDR (CrowdStrike Falcon, Microsoft Defender for Endpoint), regras YARA ou feeds de SIEM."
+        )
+
+        conteudo_hashes = fetch_firewall_rules("hashes") or "# Erro ao obter lista de hashes"
+        col_exp_btn, col_exp_code = st.columns([1, 2])
+
+        with col_exp_btn:
+            st.download_button(
+                label="📥 Baixar Lista de Hashes (malware_hashes.txt)",
+                data=conteudo_hashes,
+                file_name="malware_hashes.txt",
+                mime="text/plain",
+                use_container_width=True,
+                type="primary",
+                key="btn_download_malware_hashes_tab"
+            )
+            st.markdown("""
+            **Aplicações Práticas:**
+            * Bloqueio preventivo de execução de binários em estações e servidores.
+            * Criação de regras de detecção YARA customizadas.
+            * Ingestão em SIEM / SOAR para caça a ameaças (*Threat Hunting*).
+            """)
+
+        with col_exp_code:
+            st.code(conteudo_hashes, language="text", line_numbers=True)
+
+# ==============================================================================
+# ABA 4: CHATBOT INVESTIGATIVO FORENSE (RAG SOC)
 # ==============================================================================
 with tab_chat:
     st.markdown("### 🤖 Assistente Forense de Threat Intelligence (RAG)")
