@@ -321,28 +321,32 @@ with tab_iocs:
     iocs_data = fetch_iocs()
 
     # Métricas no topo da aba de IoCs
-    col_i1, col_i2, col_i3, col_i4, col_i5 = st.columns([1.5, 1.5, 1.5, 1.5, 1])
+    col_i1, col_i2, col_i3, col_i4, col_i5, col_i6 = st.columns([1.3, 1.3, 1.3, 1.3, 1.3, 0.9])
 
     if iocs_data is not None:
         total_ips = iocs_data.get("total_ips", 0)
         total_creds = iocs_data.get("total_credentials", 0)
         total_cmds = iocs_data.get("total_commands", 0)
+        total_malwares = iocs_data.get("total_malwares", 0)
 
         # Calcular criticidade
-        tem_critico = any(item.get("severidade") == "CRÍTICO" for item in iocs_data.get("ips", []))
-        nivel_global = "CRÍTICO 🚨" if tem_critico else ("ALTO ⚠️" if total_ips > 0 else "BAIXO 🟢")
+        tem_critico = any(item.get("severidade") == "CRÍTICO" for item in iocs_data.get("ips", [])) or \
+                      any(m.get("severidade") == "CRÍTICO" for m in iocs_data.get("malwares", []))
+        nivel_global = "CRÍTICO 🚨" if tem_critico else ("ALTO ⚠️" if total_ips > 0 or total_malwares > 0 else "BAIXO 🟢")
 
         col_i1.metric("IPs Maliciosos", total_ips, "Nós Rastreados")
         col_i2.metric("Credenciais Alvo", total_creds, "Força Bruta")
         col_i3.metric("Comandos Capturados", total_cmds, "Forensics")
-        col_i4.metric("Risco Perimetral", nivel_global, "Severidade Máxima")
+        col_i4.metric("Malwares & Hashes", total_malwares, "SHA-256")
+        col_i5.metric("Risco Perimetral", nivel_global, "Severidade Máxima")
     else:
         col_i1.metric("IPs Maliciosos", "-", "-")
         col_i2.metric("Credenciais Alvo", "-", "-")
         col_i3.metric("Comandos Capturados", "-", "-")
-        col_i4.metric("Risco Perimetral", "Desconhecido", "-")
+        col_i4.metric("Malwares & Hashes", "-", "-")
+        col_i5.metric("Risco Perimetral", "Desconhecido", "-")
 
-    with col_i5:
+    with col_i6:
         st.write("")
         if st.button("🔄 Atualizar IoCs", key="btn_refresh_iocs", use_container_width=True):
             st.rerun()
@@ -394,12 +398,13 @@ with tab_iocs:
         st.divider()
 
         # ----------------------------------------------------
-        # SEÇÃO 2: DICIONÁRIO DE CREDENCIAIS & COMANDOS FORENSES
+        # SEÇÃO 2: DICIONÁRIO DE CREDENCIAIS, COMANDOS & MALWARES
         # ----------------------------------------------------
-        st.markdown("#### 🔍 2. Auditoria Forense: Credenciais e Comandos Interceptados")
-        tab_sub_creds, tab_sub_cmds = st.tabs([
+        st.markdown("#### 🔍 2. Auditoria Forense: Credenciais, Comandos e Binários Maliciosos")
+        tab_sub_creds, tab_sub_cmds, tab_sub_malware = st.tabs([
             "🔑 Dicionário de Força Bruta (Credential Stuffing)",
-            "💻 Comandos Digitados no Terminal (Payloads)"
+            "💻 Comandos Digitados no Terminal (Payloads)",
+            "🦠 Malware & Hashes SHA-256 (Threat Intel & VirusTotal)"
         ])
 
         with tab_sub_creds:
@@ -433,15 +438,56 @@ with tab_iocs:
                     })
                 st.dataframe(pd.DataFrame(cmds_df_data), use_container_width=True, hide_index=True)
 
+        with tab_sub_malware:
+            malwares_list = iocs_data.get("malwares", [])
+            if not malwares_list:
+                st.info("Nenhum binário malicioso ou tentativa de download interceptada até o momento.")
+            else:
+                malwares_df_data = []
+                for m in malwares_list:
+                    malwares_df_data.append({
+                        "Severidade": f"🚨 {m.get('severidade')}" if m.get('severidade') == "CRÍTICO" else f"⚠️ {m.get('severidade')}",
+                        "Família / Botnet": m.get("familia"),
+                        "Arquivo / Payload": m.get("arquivo"),
+                        "Arquitetura": m.get("arquitetura"),
+                        "Veredito": m.get("veredito"),
+                        "Hash SHA-256": m.get("shasum"),
+                        "IP Atacante": m.get("ip_atacante"),
+                        "Data/Hora": m.get("timestamp", "N/A")
+                    })
+                st.dataframe(pd.DataFrame(malwares_df_data), use_container_width=True, hide_index=True)
+
+                st.markdown("##### 🔬 Investigação Aprofundada & Reputação Externa (Threat Intel Feed)")
+                for m in malwares_list:
+                    hash_short = m.get("shasum", "")[:16]
+                    with st.expander(f"🦠 {m.get('familia')} - `{m.get('arquivo')}` ({hash_short}...)"):
+                        col_m_desc, col_m_links = st.columns([2, 1])
+                        with col_m_desc:
+                            st.markdown(f"**Descrição da Ameaça:** {m.get('descricao')}")
+                            st.markdown(f"**Arquitetura Alvo:** `{m.get('arquitetura')}` | **Veredito:** `{m.get('veredito')}`")
+                            st.markdown(f"**Origem do Download:** `{m.get('url_origem')}`")
+                            st.markdown(f"**IP Atacante:** `{m.get('ip_atacante')}` | **Sessão Cowrie:** `{m.get('session')}`")
+                            st.markdown(f"**Origem dos Dados:** `{m.get('origem', 'Cowrie Honeypot')}`")
+                            st.markdown("**Hash SHA-256 Completo:**")
+                            st.code(m.get("shasum"), language="text")
+                        with col_m_links:
+                            st.markdown("###### 🌐 Consultas Externas:")
+                            vt_url = m.get("virustotal_url")
+                            mb_url = m.get("malwarebazaar_url")
+                            if vt_url:
+                                st.link_button("🛡️ Consultar no VirusTotal", vt_url, use_container_width=True)
+                            if mb_url:
+                                st.link_button("🧪 Consultar no MalwareBazaar", mb_url, use_container_width=True)
+
         st.divider()
 
         # ----------------------------------------------------
         # SEÇÃO 3: CENTRAL DE RESPOSTA ATIVA (EXPORTADOR DE FIREWALL)
         # ----------------------------------------------------
-        st.markdown("#### 🚀 3. Central de Resposta Ativa: Exportador de Firewall")
+        st.markdown("#### 🚀 3. Central de Resposta Ativa: Exportador de Firewall & IoCs")
         st.markdown(
             "Exporte scripts automatizados para bloqueio perimetral imediato "
-            "dos invasores no gateway, firewall corporativo ou no próprio Raspberry Pi."
+            "dos invasores no gateway, firewall corporativo, EDR/SIEM ou no próprio Raspberry Pi."
         )
 
         col_cfg, col_code = st.columns([1, 2])
@@ -450,11 +496,12 @@ with tab_iocs:
             opcoes_formato = [
                 ("ufw", "UFW (Debian / Ubuntu / Raspberry Pi)"),
                 ("iptables", "iptables (Linux / Roteadores)"),
+                ("hashes", "Lista de Hashes SHA-256 (EDR / Antivírus / SIEM)"),
                 ("raw", "Lista Bruta de IPs (pfSense / Pi-hole)"),
                 ("json", "JSON Estruturado (STIX / SIEM)")
             ]
             formato_selecionado = st.radio(
-                "Selecione o Formato do Firewall:",
+                "Selecione o Formato do Firewall / IoCs:",
                 [opt[0] for opt in opcoes_formato],
                 format_func=lambda x: dict(opcoes_formato).get(x, x),
                 key="radio_firewall_format"
@@ -463,6 +510,7 @@ with tab_iocs:
             extensao = {
                 "ufw": ("firewall_rules.sh", "text/x-sh"),
                 "iptables": ("iptables_rules.sh", "text/x-sh"),
+                "hashes": ("malware_hashes.txt", "text/plain"),
                 "raw": ("blocklist.txt", "text/plain"),
                 "json": ("iocs_threat_intel.json", "application/json")
             }
@@ -480,19 +528,32 @@ with tab_iocs:
                 key="btn_download_firewall"
             )
 
-            st.markdown("""
-            **Como aplicar no Raspberry Pi (Edge):**
-            ```bash
-            scp -P 50022 firewall_rules.sh pi@100.127.31.12:/tmp/
-            ssh -p 50022 pi@100.127.31.12 "sudo bash /tmp/firewall_rules.sh"
-            ```
-            """)
+            if formato_selecionado in ("ufw", "iptables"):
+                st.markdown("""
+                **Como aplicar no Raspberry Pi (Edge):**
+                ```bash
+                scp -P 50022 firewall_rules.sh pi@100.127.31.12:/tmp/
+                ssh -p 50022 pi@100.127.31.12 "sudo bash /tmp/firewall_rules.sh"
+                ```
+                """)
+            elif formato_selecionado == "hashes":
+                st.markdown("""
+                **Aplicação de Hashes SHA-256:**
+                * Importe em EDRs (CrowdStrike, Defender for Endpoint)
+                * Use em regras de detecção YARA ou SIEM (Splunk, Elastic)
+                """)
+            else:
+                st.markdown("""
+                **Aplicação de Listas / JSON:**
+                * Importe o arquivo em firewalls de borda ou feeds STIX/TAXII.
+                """)
 
         with col_code:
             st.caption(f"Pré-visualização do script gerado ({formato_selecionado}):")
+            lang = "bash" if formato_selecionado in ("ufw", "iptables") else ("json" if formato_selecionado == "json" else "text")
             st.code(
                 conteudo_script,
-                language="bash" if formato_selecionado in ("ufw", "iptables") else ("json" if formato_selecionado == "json" else "text"),
+                language=lang,
                 line_numbers=True
             )
 

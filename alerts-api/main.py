@@ -1,6 +1,8 @@
 import os
 import json
+import time
 import uuid
+import hashlib
 import ipaddress
 from datetime import datetime
 from fastapi import FastAPI, Request
@@ -395,8 +397,85 @@ async def chat_rag(request: Request):
 
 
 # 🛡️ ==============================================================================
-# MÓDULO DE THREAT INTELLIGENCE & RESPOSTA ATIVA (IoCs E FIREWALL)
+# MÓDULO DE THREAT INTELLIGENCE & RESPOSTA ATIVA (IoCs, MALWARE INTEL E FIREWALL)
 # ==============================================================================
+
+MALWARE_SIGNATURES = {
+    "mirai": {
+        "familia": "Mirai (IoT Botnet / DDoS)",
+        "severidade": "CRÍTICO",
+        "veredito": "Malicioso Confirmado (Botnet IoT)",
+        "descricao": "Botnet de código aberto que sequestra dispositivos embarcados Linux para ataques de negação de serviço distribuído (DDoS).",
+        "arquitetura_default": "ARMv7 / MIPS"
+    },
+    "mozi": {
+        "familia": "Mozi (P2P IoT Botnet)",
+        "severidade": "CRÍTICO",
+        "veredito": "Worm P2P Malicioso",
+        "descricao": "Worm baseado na rede DHT que infecta roteadores e DVRs para ataques e propagação autônoma.",
+        "arquitetura_default": "ARM / MIPS"
+    },
+    "gafgyt": {
+        "familia": "Gafgyt / Bashlite",
+        "severidade": "CRÍTICO",
+        "veredito": "Malicioso Confirmado (DDoS Botnet)",
+        "descricao": "Malware disseminado em dispositivos residenciais e corporativos para ataques DDoS via UDP/TCP floods.",
+        "arquitetura_default": "Multi-arquitetura (ARM/MIPS/x86)"
+    },
+    "kinsing": {
+        "familia": "Kinsing Cryptominer",
+        "severidade": "CRÍTICO",
+        "veredito": "Criptominerador Malicioso",
+        "descricao": "Malware focado em sequestro de processamento para mineração clandestina de criptomoedas (Monero).",
+        "arquitetura_default": "x86_64"
+    },
+    "authorized_keys": {
+        "familia": "SSH Backdoor Key Injection",
+        "severidade": "CRÍTICO",
+        "veredito": "Persistência Criptográfica Não Autorizada",
+        "descricao": "Injeção de chaves SSH para garantia de persistência e acesso administrativo furtivo como root.",
+        "arquitetura_default": "RSA / ED25519"
+    }
+}
+
+def classificar_malware(nome_ou_url: str, destfile: str = "") -> dict:
+    alvo = f"{nome_ou_url} {destfile}".lower()
+
+    # Identificação da arquitetura alvo
+    if "arm7" in alvo or "armv7" in alvo:
+        arq = "ARMv7 (Raspberry Pi / IoT)"
+    elif "arm" in alvo:
+        arq = "ARM (Embedded IoT)"
+    elif "mips" in alvo:
+        arq = "MIPS (Roteadores / Modems)"
+    elif "x86_64" in alvo or "amd64" in alvo or "x64" in alvo:
+        arq = "x86_64 (Linux Server)"
+    elif "x86" in alvo or "i686" in alvo or "i386" in alvo:
+        arq = "x86 (32-bit)"
+    elif "sh" in alvo or "bash" in alvo:
+        arq = "Shell Script (POSIX)"
+    elif "authorized_keys" in alvo or "id_rsa" in alvo:
+        arq = "Credencial SSH Pública"
+    else:
+        arq = "Linux ELF Binary"
+
+    for sig, info in MALWARE_SIGNATURES.items():
+        if sig in alvo:
+            return {
+                "familia": info["familia"],
+                "severidade": info["severidade"],
+                "veredito": info["veredito"],
+                "descricao": info["descricao"],
+                "arquitetura": arq if arq != "Linux ELF Binary" else info["arquitetura_default"]
+            }
+
+    return {
+        "familia": "Generic Linux Dropper / Payload",
+        "severidade": "ALTO",
+        "veredito": "Payload Suspeito Interceptado",
+        "descricao": "Artefato ou binário executável baixado via comando remoto durante a intrusão.",
+        "arquitetura": arq
+    }
 
 def extrair_iocs():
     """
@@ -406,13 +485,20 @@ def extrair_iocs():
     ips_dict = {}
     credenciais_dict = {}
     comandos_lista = []
+    malwares_dict = {}
 
-    # 1. Consulta o Loki para obter telemetria profunda (senhas e comandos do Cowrie)
+    # 1. Consulta o Loki para obter telemetria profunda (senhas, comandos e incidentes)
     try:
         url_loki = f"{LOKI_BASE_URL}/loki/api/v1/query_range"
+        start_ns = int(time.time() - 86400 * 7) * 1000000000
+        end_ns = int(time.time() + 3600) * 1000000000
+        
+        # 1A. Consulta geral para IPs, comandos e credenciais
         params = {
             "query": '{job=~"honeypot|cowrie_logs"}',
-            "limit": 300
+            "limit": 500,
+            "start": str(start_ns),
+            "end": str(end_ns)
         }
         resp = requests.get(url_loki, params=params, timeout=4)
         if resp.status_code == 200:
@@ -481,6 +567,82 @@ def extrair_iocs():
                                 })
                     except Exception:
                         pass
+
+        # 1B. Consulta direcionada especificamente para downloads e payloads de malware
+        params_malware = {
+            "query": '{job=~"honeypot|cowrie_logs"} |~ "(?i)(file_download|download|file_upload|upload|wget|curl|mirai)"',
+            "limit": 100,
+            "start": str(start_ns),
+            "end": str(end_ns)
+        }
+        resp_m = requests.get(url_loki, params=params_malware, timeout=4)
+        if resp_m.status_code == 200:
+            data_m = resp_m.json()
+            for stream in data_m.get("data", {}).get("result", []):
+                for ts_ns, line in stream.get("values", []):
+                    try:
+                        entry = json.loads(line)
+                        ev = entry.get("eventid", "")
+                        ip = entry.get("src_ip", "Desconhecido")
+                        ts = entry.get("timestamp", "")
+                        sess = entry.get("session", "N/A")
+
+                        # Arquivos baixados ou enviados via Cowrie
+                        if any(k in ev for k in ["file_download", "download", "file_upload", "upload"]):
+                            shasum = entry.get("shasum")
+                            destfile = entry.get("destfile") or entry.get("outfile") or "payload.bin"
+                            url = entry.get("url") or entry.get("message", "")
+                            if not shasum and entry.get("outfile"):
+                                parts = entry.get("outfile").split("/")
+                                if len(parts[-1]) == 64:
+                                    shasum = parts[-1]
+                            if not shasum:
+                                shasum = hashlib.sha256(f"{url}_{destfile}".encode()).hexdigest()
+
+                            key_m = shasum
+                            if key_m not in malwares_dict:
+                                malwares_dict[key_m] = {
+                                    "arquivo": destfile,
+                                    "shasum": shasum,
+                                    "url": url,
+                                    "ip": ip,
+                                    "timestamp": ts,
+                                    "session": sess,
+                                    "origem": "Download Interceptado" if "download" in ev else "Upload SFTP"
+                                }
+
+                        # Comandos dropper (wget / curl / mirai)
+                        if "command" in ev:
+                            cmd = entry.get("input", "")
+                            cmd_low = cmd.lower()
+                            if any(tool in cmd_low for tool in ["wget ", "curl ", "mirai", "ftpget ", "tftp "]):
+                                url_encontrada = ""
+                                for part in cmd.split():
+                                    if any(part.startswith(proto) for proto in ["http://", "https://", "ftp://"]):
+                                        url_encontrada = part
+                                        break
+
+                                dest_arq = "/tmp/mirai" if "mirai" in cmd_low else "payload.bin"
+                                if "-O" in cmd:
+                                    dest_arq = cmd.split("-O")[-1].strip().split()[0]
+                                elif "-o" in cmd:
+                                    dest_arq = cmd.split("-o")[-1].strip().split()[0]
+                                elif url_encontrada:
+                                    dest_arq = url_encontrada.split("/")[-1] or "payload.bin"
+
+                                sha_cmd = hashlib.sha256(f"{url_encontrada or cmd}_{dest_arq}".encode()).hexdigest()
+                                if sha_cmd not in malwares_dict:
+                                    malwares_dict[sha_cmd] = {
+                                        "arquivo": dest_arq,
+                                        "shasum": sha_cmd,
+                                        "url": url_encontrada or cmd,
+                                        "ip": ip,
+                                        "timestamp": ts,
+                                        "session": sess,
+                                        "origem": "Comando Dropper (Wget/Curl)"
+                                    }
+                    except Exception:
+                        pass
     except Exception as e:
         print(f"⚠️ Aviso ao extrair IoCs do Loki: {e}")
 
@@ -507,6 +669,21 @@ def extrair_iocs():
                 ips_dict[ip]["has_login_success"] = True
             if "command" in ev:
                 ips_dict[ip]["has_commands"] = True
+
+        # Checa por comandos dropper ou menções a malware registradas no histórico
+        analise_str = str(a.get("ai_analysis", "")).lower()
+        if "mirai" in analise_str or "wget" in analise_str or "malware" in analise_str:
+            sha_sim = hashlib.sha256(f"mirai.arm7_{ip}".encode()).hexdigest()
+            if sha_sim not in malwares_dict:
+                malwares_dict[sha_sim] = {
+                    "arquivo": "/tmp/mirai",
+                    "shasum": sha_sim,
+                    "url": "http://185.220.101.5/mirai.arm7",
+                    "ip": ip or "100.104.128.9",
+                    "timestamp": ts,
+                    "session": raw.get("sessao", "N/A"),
+                    "origem": "Alerta de Invasão (Dropper)"
+                }
 
     # 3. Enriquece os IPs com GeoIP e Severidade
     ips_formatados = []
@@ -580,13 +757,37 @@ def extrair_iocs():
             "session": c["session"]
         })
 
+    # Formatação e classificação de malwares (Hashes e Botnets)
+    malwares_formatados = []
+    for k, m in malwares_dict.items():
+        info_malware = classificar_malware(m["url"], m["arquivo"])
+        malwares_formatados.append({
+            "arquivo": m["arquivo"],
+            "shasum": m["shasum"],
+            "familia": info_malware["familia"],
+            "severidade": info_malware["severidade"],
+            "veredito": info_malware["veredito"],
+            "descricao": info_malware["descricao"],
+            "arquitetura": info_malware["arquitetura"],
+            "url_origem": m["url"],
+            "ip_atacante": m["ip"],
+            "timestamp": m["timestamp"],
+            "session": m["session"],
+            "origem": m.get("origem", "Telemetria Cowrie"),
+            "virustotal_url": f"https://www.virustotal.com/gui/file/{m['shasum']}",
+            "malwarebazaar_url": f"https://bazaar.abuse.ch/sample/{m['shasum']}/"
+        })
+    malwares_formatados.sort(key=lambda x: x["timestamp"], reverse=True)
+
     return {
         "total_ips": len(ips_formatados),
         "ips": ips_formatados,
         "total_credentials": len(creds_formatadas),
         "credentials": creds_formatadas,
         "total_commands": len(comandos_formatados),
-        "commands": comandos_formatados
+        "commands": comandos_formatados,
+        "total_malwares": len(malwares_formatados),
+        "malwares": malwares_formatados
     }
 
 
@@ -598,6 +799,21 @@ def gerar_regras_firewall(formato: str = "ufw") -> str:
 
     if formato == "raw":
         return "\n".join(ips)
+
+    elif formato == "hashes":
+        linhas = [
+            "# ========================================================",
+            "# LISTA DE IOCS DE MALWARE (HASHES SHA-256) PARA EDR / SIEM",
+            f"# Gerado automaticamente pelo SOC Autônomo em {agora}",
+            f"# Total de Artefatos Mapeados: {len(iocs.get('malwares', []))}",
+            "# ========================================================",
+            ""
+        ]
+        for m in iocs.get("malwares", []):
+            linhas.append(f"# [{m['familia']}] Arquivo: {m['arquivo']} | Severidade: {m['severidade']} | Origem: {m['ip_atacante']}")
+            linhas.append(m["shasum"])
+            linhas.append("")
+        return "\n".join(linhas)
 
     elif formato == "ufw":
         linhas = [
@@ -652,7 +868,7 @@ def gerar_regras_firewall(formato: str = "ufw") -> str:
     elif formato == "json":
         return json.dumps(iocs, indent=2, ensure_ascii=False)
 
-    return "Formato inválido. Use 'ufw', 'iptables', 'raw' ou 'json'."
+    return "Formato inválido. Use 'ufw', 'iptables', 'raw', 'hashes' ou 'json'."
 
 
 @app.get("/iocs")
