@@ -1,40 +1,17 @@
-services:
-  cowrie:
-    image: cowrie/cowrie:latest
-    container_name: cowrie-honeypot
-    restart: unless-stopped
-    ports:
-      - "2222:2222"
-      - "2223:2223"
-    volumes:
-      - ./cowrie/var/log/cowrie:/cowrie/cowrie-git/var/log/cowrie
-    networks:
-      - tcc-network
+version: '3.8'
 
+services:
   loki:
     image: grafana/loki:latest
     container_name: loki
     restart: unless-stopped
     ports:
-      - "3100:3100"
+      - "3100:3100" # O "0.0.0.0" força o Docker a escutar em TODAS as placas de rede
     volumes:
       - ./loki/loki-config.yaml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - tcc-network
-
-  promtail:
-    image: grafana/promtail:latest
-    container_name: promtail
-    restart: unless-stopped
-    volumes:
-      - ./promtail/promtail-config.yaml:/etc/promtail/config.yml
-      - ./cowrie/var/log/cowrie:/var/log/cowrie
-    command: -config.file=/etc/promtail/config.yml
-    networks:
-      - tcc-network
-    depends_on:
-      - loki
 
   grafana:
     image: grafana/grafana:latest
@@ -63,10 +40,13 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
+    volumes:
+      - ./alerts-api:/app
     networks:
       - tcc-network
     env_file:
       - .env 
+
   ollama:
     image: ollama/ollama:latest
     container_name: ollama_tcc
@@ -77,6 +57,18 @@ services:
       - ollama_data:/root/.ollama
     networks:
       - tcc-network
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: chroma_vector_db
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chroma_data:/chroma/chroma
+    networks:
+      - tcc-network
+
   frontend:
     build: 
       context: ./frontend
@@ -90,6 +82,41 @@ services:
       - grafana
     networks:
       - tcc-network
+
+  # TÚNEL 1: O Painel Principal (Frontend Streamlit)
+  ngrok-frontend:
+      image: ngrok/ngrok:latest
+      container_name: ngrok-frontend
+      restart: unless-stopped
+      environment:
+        - NGROK_AUTHTOKEN=3CN8gEwSvjAUlit4UG1PZ4YTCeC_2GaFz4sstrPEyWyY3dTfU
+      command:
+        - "http"
+        - "frontend:8501"
+      ports:
+        - "4040:4040"
+      networks:
+        - tcc-network 
+      depends_on:
+        - frontend
+        - ngrok-grafana
+
+  # TÚNEL 2: O Iframe Oculto (Grafana)
+  ngrok-grafana:
+    image: ngrok/ngrok:latest
+    container_name: ngrok-grafana
+    restart: unless-stopped
+    environment:
+      - NGROK_AUTHTOKEN=3EXYZ0tlCDHieF0dvDUEFDT2sDn_6FXC9TFFC2GsZZG4jpzdK
+    command:
+      - "http"
+      - "grafana:3000"
+    ports:
+      - "4041:4040"
+    networks:
+      - tcc-network 
+    depends_on:
+      - grafana
 
 volumes:
   ollama_data:

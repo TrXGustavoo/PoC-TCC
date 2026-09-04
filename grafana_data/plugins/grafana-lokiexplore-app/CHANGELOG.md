@@ -1,5 +1,189 @@
 # Changelog
 
+## [2.5.2](https://github.com/grafana/logs-drilldown/compare/v2.5.1...v2.5.2) (2026-08-26)
+
+
+### 🐛 Bug Fixes
+
+* **LogList:** show the exact log count in volume and logs panels ([#2056](https://github.com/grafana/logs-drilldown/issues/2056)) ([16a8e69](https://github.com/grafana/logs-drilldown/commit/16a8e69ea4a31a4a796cedbd77c81a9664f970fa))
+* **LogsVolumePanel:** improve accuracy of results in the panel title displayed count ([#2057](https://github.com/grafana/logs-drilldown/issues/2057)) ([b96afa3](https://github.com/grafana/logs-drilldown/commit/b96afa3236e185c0e04d6ab60cd3992f12763791))
+* **panels:** add mapping for trace color ([#2059](https://github.com/grafana/logs-drilldown/issues/2059)) ([7462da7](https://github.com/grafana/logs-drilldown/commit/7462da78e9a58456411eda023c5b6561d83c0e96))
+* **VisualRefresh:** Fixes background in controls header ([#2058](https://github.com/grafana/logs-drilldown/issues/2058)) ([4418b4d](https://github.com/grafana/logs-drilldown/commit/4418b4d6f1048100b3475be69df057ce0b3eb09e))
+
+
+### 📝 Documentation
+
+* **table:** add logs table and update logs panel docs with images ([#2047](https://github.com/grafana/logs-drilldown/issues/2047)) ([7f77b97](https://github.com/grafana/logs-drilldown/commit/7f77b97d9c36692669067f349e37cc3ddf820a7a))
+
+
+### 🧹 Chore
+
+* update release please ([#2060](https://github.com/grafana/logs-drilldown/issues/2060)) ([614386f](https://github.com/grafana/logs-drilldown/commit/614386ffa365255914bad68b6264f4a78cd91fda))
+
+## [2.5.1](https://github.com/grafana/logs-drilldown/compare/v2.5.0...v2.5.1) (2026-08-12)
+
+
+### 🐛 Bug Fixes
+
+* **assistant:** update to latest and fix context bugs ([#2041](https://github.com/grafana/logs-drilldown/issues/2041)) ([807ae88](https://github.com/grafana/logs-drilldown/commit/807ae881dc61610c03da330bd94df1ec6d5e065d))
+* **deps:** bump pnpm overrides for CVE remediation ([#2036](https://github.com/grafana/logs-drilldown/issues/2036)) ([0f02b5c](https://github.com/grafana/logs-drilldown/commit/0f02b5c832006e348d81ce1479f0685f4351ad4c))
+* **deps:** bump pnpm overrides for CVE remediation ([#2044](https://github.com/grafana/logs-drilldown/issues/2044)) ([b211e84](https://github.com/grafana/logs-drilldown/commit/b211e84d54a7d0b96b10b55fde84b720e7792b4e))
+* **InterceptBanner:** add padding around the message ([#2043](https://github.com/grafana/logs-drilldown/issues/2043)) ([b2f7e89](https://github.com/grafana/logs-drilldown/commit/b2f7e896866ff448e22a9a9e4f97fcefe6a014ed))
+* **levels:** use gray (dimgray) for debug level color ([#2021](https://github.com/grafana/logs-drilldown/issues/2021)) ([e8ddf8d](https://github.com/grafana/logs-drilldown/commit/e8ddf8d3dc9ada0c274596d30958d6026428e037))
+
+
+### 📝 Documentation
+
+* add local project context for docs skills ([#2046](https://github.com/grafana/logs-drilldown/issues/2046)) ([0b9a70d](https://github.com/grafana/logs-drilldown/commit/0b9a70d0efeebf47e2175bcc670e647622ead986))
+* document recent UI changes and standardize product name usage ([#2045](https://github.com/grafana/logs-drilldown/issues/2045)) ([fa723fe](https://github.com/grafana/logs-drilldown/commit/fa723fe13e48cf4c7603275bb612e2ced4adf994))
+
+
+### 🧹 Chore
+
+* **deps:** add pnpm supply-chain security settings ([#2006](https://github.com/grafana/logs-drilldown/issues/2006)) ([459077f](https://github.com/grafana/logs-drilldown/commit/459077f75e0e7bd7b11b8edd9de9fb0e3e3d9f3d))
+* **release:** show chore in changelog ([#2037](https://github.com/grafana/logs-drilldown/issues/2037)) ([b7cdf76](https://github.com/grafana/logs-drilldown/commit/b7cdf76f7d3159f7ce59f1d544a8d507dacb317f))
+
+## [2.5.0](https://github.com/grafana/logs-drilldown/compare/v2.4.0...v2.5.0) (2026-08-04)
+
+
+### 🎉 Features
+
+* **LogsVolumePanel:** update color for the visible range ([#2019](https://github.com/grafana/logs-drilldown/issues/2019)) ([a85b467](https://github.com/grafana/logs-drilldown/commit/a85b46795aae759feeacde34ffc5213128d1bb89))
+
+
+### 🐛 Bug Fixes
+
+* **crypto:** use uuid ([#2017](https://github.com/grafana/logs-drilldown/issues/2017)) ([a026605](https://github.com/grafana/logs-drilldown/commit/a0266058a1191e867927e73c652dbac7a82aae50))
+* **deps:** bump brace-expansion pnpm overrides for CVE remediation ([#2002](https://github.com/grafana/logs-drilldown/issues/2002)) ([5132ae2](https://github.com/grafana/logs-drilldown/commit/5132ae2a482c269e05815bd935a5087e8594cd22))
+* **deps:** resolve pnpm audit vulnerabilities ([#2005](https://github.com/grafana/logs-drilldown/issues/2005)) ([2568a22](https://github.com/grafana/logs-drilldown/commit/2568a2237c975dbcb0f8baad2c1b81e014c0b3cc))
+* **deps:** resolve pnpm audit vulnerabilities ([#2012](https://github.com/grafana/logs-drilldown/issues/2012)) ([8567ef3](https://github.com/grafana/logs-drilldown/commit/8567ef3e76d18d036f725ab9cd1da6d1bfe1f933))
+* **embed:** do not show the welcome banner in embed ([#2003](https://github.com/grafana/logs-drilldown/issues/2003)) ([1a8ac7f](https://github.com/grafana/logs-drilldown/commit/1a8ac7f563a62ead0411ee193c8446c06eed7415))
+* **header:** use ButtonGroup for plugin header toolbar ([#2009](https://github.com/grafana/logs-drilldown/issues/2009)) ([f802cc4](https://github.com/grafana/logs-drilldown/commit/f802cc414a75568cf495a993bd2e78fc5c20ca95))
+
+## [2.4.0](https://github.com/grafana/logs-drilldown/compare/v2.3.0...v2.4.0) (2026-07-20)
+
+
+### 🎉 Features
+
+* **DefaultColumns:** add support for stored multiple values of the same label as a regex ([#1997](https://github.com/grafana/logs-drilldown/issues/1997)) ([ddb5e1f](https://github.com/grafana/logs-drilldown/commit/ddb5e1fbe9f2c63b82e6b1d58a2609f9d4d54650))
+
+
+### 🐛 Bug Fixes
+
+* **LogsTablePanelScene:** fix missing title in Table NG ([#1998](https://github.com/grafana/logs-drilldown/issues/1998)) ([6515f41](https://github.com/grafana/logs-drilldown/commit/6515f41671d2314467ab69391c1b1ff00b5c7afc))
+
+## [2.3.0](https://github.com/grafana/logs-drilldown/compare/v2.2.1...v2.3.0) (2026-07-16)
+
+
+### 🎉 Features
+
+* **store:** refactor expanded/collapsed logs storage ([#1991](https://github.com/grafana/logs-drilldown/issues/1991)) ([072e886](https://github.com/grafana/logs-drilldown/commit/072e88655e9b1f260a9490dcd5ec1161939ffe44))
+
+## [2.2.1](https://github.com/grafana/logs-drilldown/compare/v2.2.0...v2.2.1) (2026-07-10)
+
+
+### 🐛 Bug Fixes
+
+* **generator:** add otel address ([#1986](https://github.com/grafana/logs-drilldown/issues/1986)) ([c092087](https://github.com/grafana/logs-drilldown/commit/c09208701d7f5375dbafb2d005135873b7f8ec9a))
+* **levels:** use neutral blue for info level instead of green ([#1990](https://github.com/grafana/logs-drilldown/issues/1990)) ([6b61807](https://github.com/grafana/logs-drilldown/commit/6b6180773fc6a4a34cd3b9245bcfb035787f2219))
+* **parsePrometheusDuration:** fix regexp builder. ([#1987](https://github.com/grafana/logs-drilldown/issues/1987)) ([1e3dcdf](https://github.com/grafana/logs-drilldown/commit/1e3dcdf6a975776a908e59b89d4c5abde8947fd3))
+* **url:** update scenes, remove json and line filter from service url ([#1977](https://github.com/grafana/logs-drilldown/issues/1977)) ([ee5a651](https://github.com/grafana/logs-drilldown/commit/ee5a651eb2fad17ec6f593e316256ab1e2b39f20))
+
+## [2.2.0](https://github.com/grafana/logs-drilldown/compare/v2.1.5...v2.2.0) (2026-07-01)
+
+
+### 🎉 Features
+
+* **Fields:** Add support for optional parsers ([#1975](https://github.com/grafana/logs-drilldown/issues/1975)) ([a8f10be](https://github.com/grafana/logs-drilldown/commit/a8f10befca364368d7b1b224b41d9d6a6270bb16))
+
+
+### 🐛 Bug Fixes
+
+* **deps:** update all non-major dependencies ([#1982](https://github.com/grafana/logs-drilldown/issues/1982)) ([971957a](https://github.com/grafana/logs-drilldown/commit/971957ad9ad02e8f7959cda65380734beb9aabb6))
+
+
+### 📝 Documentation
+
+* add GenAI policy, contributor guide, and issue template updates ([#1983](https://github.com/grafana/logs-drilldown/issues/1983)) ([1a4d93d](https://github.com/grafana/logs-drilldown/commit/1a4d93df23605e3fd9d5bb70c8c25e73d2b0e137))
+
+## [2.1.5](https://github.com/grafana/logs-drilldown/compare/v2.1.4...v2.1.5) (2026-06-24)
+
+
+### 🐛 Bug Fixes
+
+* **deps:** bump dompurify override to 3.4.11 for CVE remediation ([#1970](https://github.com/grafana/logs-drilldown/issues/1970)) ([b607808](https://github.com/grafana/logs-drilldown/commit/b60780830c857198f55650efa3b7a7c67e3630ce))
+
+## [2.1.4](https://github.com/grafana/logs-drilldown/compare/v2.1.3...v2.1.4) (2026-06-22)
+
+
+### 🐛 Bug Fixes
+
+* **generateLinkFromFilters:** fix potentially duplicated filters ([#1969](https://github.com/grafana/logs-drilldown/issues/1969)) ([e2bb984](https://github.com/grafana/logs-drilldown/commit/e2bb98424477ecda91c2f2b7006d7383c7f9760e))
+* **Layout:** improve layout resizing ([#1966](https://github.com/grafana/logs-drilldown/issues/1966)) ([c63373a](https://github.com/grafana/logs-drilldown/commit/c63373aebbfcd4016f7f95cb6526ec67fe0dbfc5))
+
+## 2.1.3
+
+##### Chores
+
+* **ci:**
+  *  update version-pr trigger (#1949) (23d225ef)
+  *  update bundle-types node version (#1950) (e759c4e0)
+* **deps:**  update to 13.0.2, remove unused, pin (#1941) (3c18411d)
+
+##### New Features
+
+* **logs:**  new options for service selection (show context, go to log line, show similar log lines, add line filter) and updated permalinks (#1940) (158acbf0)
+
+##### Bug Fixes
+
+* **security/high/:**  update security protobufjs to v8.6.0 [security] (#1956) (6a229187)
+* **ServiceSelection:**  fix broken context queries in due to trailing commas (#1953) (34b809e7)
+
+
+## 2.1.2
+
+##### Chores
+
+* **version-pr:**  try creating a pr for version-bump-changelog (#1942) (2b21a5d1)
+* **release-please:**  update trigger to autogenerate git tags (#1939) (6f233d77)
+
+
+## 2.1.1
+
+##### Bug Fixes
+
+* **ServiceSelectionTabsScene:**  rename add tab action (#1937) (732e748c)
+
+
+## [2.1.0](https://github.com/grafana/logs-drilldown/compare/v2.0.4...v2.1.0) (2026-06-09)
+
+
+### 🎉 Features
+
+* **ExpandCondenseLosgsView:** Move to Panel Menu ([#1932](https://github.com/grafana/logs-drilldown/issues/1932)) ([1ce28e0](https://github.com/grafana/logs-drilldown/commit/1ce28e0c7114bbc7405da34606d4f2a045d933a2))
+* **LogsListScene:** Allow logs panel to fit the screen height with an option to use full screen size ([#1895](https://github.com/grafana/logs-drilldown/issues/1895)) ([2812f8b](https://github.com/grafana/logs-drilldown/commit/2812f8b24d572ed3a27af23322dcde8302b815ea))
+* **LogsTablePanel:** Add support for the Logs Table native visualization ([#1752](https://github.com/grafana/logs-drilldown/issues/1752)) ([d6da40b](https://github.com/grafana/logs-drilldown/commit/d6da40b4b75e47b6e24623bfa504ae5e61f5ec10))
+
+
+### 🐛 Bug Fixes
+
+* **BreadownView:** remove hardcoded min height ([#1903](https://github.com/grafana/logs-drilldown/issues/1903)) ([edc2993](https://github.com/grafana/logs-drilldown/commit/edc2993610005d458eb278feccf27cb1631e8c8b))
+* **ci:** use JSON output for Crowdin token from get-vault-secrets ([#1935](https://github.com/grafana/logs-drilldown/issues/1935)) ([e9aed5e](https://github.com/grafana/logs-drilldown/commit/e9aed5ef4e945a206afae2c967bfd0016ef6ffba)), closes [#1934](https://github.com/grafana/logs-drilldown/issues/1934)
+* **deps:** patch transitive vulnerabilities via pnpm overrides ([#1920](https://github.com/grafana/logs-drilldown/issues/1920)) ([591bce0](https://github.com/grafana/logs-drilldown/commit/591bce0b981de722ed14221d6723e5a37cd47888))
+* **filters:** add tooltips for each type of filter ([#1876](https://github.com/grafana/logs-drilldown/issues/1876)) ([a48af80](https://github.com/grafana/logs-drilldown/commit/a48af805343eb417578a17e8d6af5fb406fff5bc))
+* **levels filter:** reuse levels from Logs Volume if available ([#1873](https://github.com/grafana/logs-drilldown/issues/1873)) ([b121272](https://github.com/grafana/logs-drilldown/commit/b1212724a37008f7e5894649162aa4843496fc03))
+* **LevelsVariableScene:** fix negative values in queries and the displayed value in the combobox ([#1893](https://github.com/grafana/logs-drilldown/issues/1893)) ([1ed53ff](https://github.com/grafana/logs-drilldown/commit/1ed53ffbb331b17f0c071ea68aa83b80c3c564ad))
+* **lineFilters:** cancel debounced requests when onToggleExclusive changes ([#1899](https://github.com/grafana/logs-drilldown/issues/1899)) ([7284df1](https://github.com/grafana/logs-drilldown/commit/7284df169ac7f7682ecb72144052df91d9631a27))
+* **lineLimit:** show invalid for values over the max line limit ([#1902](https://github.com/grafana/logs-drilldown/issues/1902)) ([39d3245](https://github.com/grafana/logs-drilldown/commit/39d3245e463a56dd49042ea9aee43f84c9f9ce11))
+* **LogsPanelScene:** set timestamp resolution from viz options ([#1892](https://github.com/grafana/logs-drilldown/issues/1892)) ([50fed81](https://github.com/grafana/logs-drilldown/commit/50fed813dda88d800d71d3d5df94b5b3df6def36))
+* **security/unknown/generator:** update module golang.org/x/net to v0.55.0 [security] ([#1923](https://github.com/grafana/logs-drilldown/issues/1923)) ([1f0d313](https://github.com/grafana/logs-drilldown/commit/1f0d313a3ba2d1d86bba5c0ff70128922971948e))
+
+
+### 🤖 Continuous Integrations
+
+* **advisor:** turn off the advisor app ([#1886](https://github.com/grafana/logs-drilldown/issues/1886)) ([6c9a8f4](https://github.com/grafana/logs-drilldown/commit/6c9a8f4081babbae428393ef0ac4959437aad88d))
+* **release-please:** add release please ([#1885](https://github.com/grafana/logs-drilldown/issues/1885)) ([3857226](https://github.com/grafana/logs-drilldown/commit/3857226f9f81c05b0fa050e66c97ce9eebccc4cc))
+
 ## 2.0.4
 
 ##### Build System / Dependencies

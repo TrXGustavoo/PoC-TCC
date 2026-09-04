@@ -3,14 +3,15 @@
 alerts-api/.env
 
 # Logs do Cowrie (Não subir os ataques registrados)
-cowrie/var/log/cowrie/*.json
-cowrie/var/log/cowrie/*.log
+cowrie/var/log/cowrie/*.json*
+cowrie/var/log/cowrie/*.log*
 cowrie/var/log/cowrie/tty/
-cowrie\var\log\cowrie\cowrie.json
+cowrie/var/lib/cowrie/downloads/
 
 # Dados do banco do Loki (Evitar repositórios gigantes)
 loki/chunks/
 loki/rules/
+loki/back
 
 # Python
 __pycache__/

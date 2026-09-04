@@ -3,7 +3,6 @@
     "loading": "Loading Adaptive Traces..."
   },
   "add-to-filters-action": {
-    "aria-label": "Add to filters",
     "exclude": "Exclude",
     "include": "Include"
   },
@@ -29,9 +28,6 @@
     "layout-grid": "Grid",
     "layout-rows": "Rows",
     "layout-single": "Single"
-  },
-  "attribute-panel-rows": {
-    "no-series-data": "No series data"
   },
   "attributes-breakdown-scene": {
     "error-label": "Error",
@@ -65,19 +61,6 @@
     "selected-count_one": "Selected ({{count}}):",
     "selected-count_other": "Selected ({{count}}):"
   },
-  "bookmark-icon": {
-    "bookmark": "Bookmark",
-    "remove-bookmark": "Remove bookmark"
-  },
-  "bookmark-item": {
-    "description": "<0>{{metric}}</0> of <2>{{signal}}</2> ({{actionView}})"
-  },
-  "bookmarks": {
-    "loading": "Loading bookmarks...",
-    "no-bookmarks": "Bookmark your favorite queries to view them here.",
-    "or-view-bookmarks": "Or view bookmarks",
-    "remove-bookmark": "Remove bookmark"
-  },
   "by-frame-repeater": {
     "no-data-for-search": "No data for search term"
   },
@@ -98,8 +81,10 @@
     "description": "View exception details from errored traces for the current set of filters."
   },
   "exceptions-table": {
-    "exclude": "Exclude",
     "exclude-aria-label": "Exclude exception message",
+    "grouped-messages-aria-label": "Show grouped exception messages",
+    "grouped-messages-common-prefix": "Common",
+    "grouped-messages-title": "Grouped messages",
     "header": {
       "exception-details": "Exception Details",
       "exception-details-tooltip": "Exception type, message, service, and last seen timestamp. Use the include/exclude buttons to include or exclude exception messages, or click on type or message to filter.",
@@ -108,7 +93,6 @@
       "occurrences": "Occurrences",
       "occurrences-tooltip": "Total number of times this exception has occurred"
     },
-    "include": "Include",
     "include-aria-label": "Include exception message"
   },
   "exemplars": {
@@ -123,28 +107,8 @@
       "close": "Close"
     }
   },
-  "header-scene": {
-    "data-source": "Data source",
-    "filter": "Filter",
-    "lets-start": "Let's start",
-    "quick-start": "Or quick-start into your tracing data",
-    "read-documentation": "Read documentation",
-    "subtitle": "Drilldown and visualize your trace data without writing a query.",
-    "title": "Start your traces exploration!"
-  },
   "highest-difference-panel": {
-    "exclude": "Exclude",
-    "include": "Include",
     "title": "Highest difference"
-  },
-  "home": {
-    "data-source-label": "Data source",
-    "errored-services": "Errored services",
-    "slow-services": "Slow services",
-    "slow-traces": "Slow traces"
-  },
-  "insights-timeline-widget": {
-    "label": "Insights"
   },
   "inspect-attribute-action": {
     "inspect": "Inspect"
@@ -164,7 +128,7 @@
     "title": "Load a previously saved search"
   },
   "load-search-scene": {
-    "load-saved-query": "Load saved query",
+    "load-saved-query": "Load Saved query",
     "load-saved-search": "Load saved search",
     "no-saved-searches": "No saved searches to load"
   },
@@ -172,6 +136,8 @@
     "label": "Open in Traces Drilldown"
   },
   "panel-menu": {
+    "add-to-dashboard": "Add to dashboard",
+    "create-alert": "Create alert",
     "explore": "Explore",
     "navigation": "Navigation"
   },
@@ -184,6 +150,25 @@
     "p95": "p95",
     "p99": "p99"
   },
+  "plugin-info": {
+    "button": {
+      "title": "Plugin info",
+      "tooltip": "Plugin info"
+    },
+    "header": {
+      "last-update": "Last update: {{updated}}",
+      "title": "Grafana Traces Drilldown v{{version}}"
+    },
+    "menu": {
+      "changelog": "Changelog",
+      "commit-sha": "Commit SHA: {{sha}}",
+      "contribute": "Contribute",
+      "documentation": "Documentation",
+      "give-feedback": "Give feedback",
+      "grafana-version": "Grafana {{edition}} ({{env}})",
+      "report-issue": "Report an issue"
+    }
+  },
   "primary-signal-variable": {
     "primary-signal": "Primary signal",
     "primary-signal-label": "Primary signal"
@@ -192,7 +177,7 @@
     "comparison-selection": "Comparison selection"
   },
   "save-search-button": {
-    "save-in-saved-queries": "Save in Saved Queries",
+    "save-in-saved-queries": "Save in Saved queries Queries",
     "save-search": "Save search"
   },
   "save-search-modal": {
@@ -264,21 +249,12 @@
     "header": {
       "data-source": "Data source",
       "filters": "Filters",
-      "need-help": "Need help",
       "trace-id": "Trace ID",
       "trace-id-placeholder": "Enter an ID and press Enter"
-    },
-    "menu": {
-      "documentation": "Documentation",
-      "give-feedback": "Give feedback"
     },
     "variable": {
       "data-source": "Data source",
       "duration-percentiles": "Duration Percentiles"
-    },
-    "version-header": {
-      "last-update": "Last update: {{compositeVersion}}",
-      "title": "Grafana Traces Drilldown v{{version}}"
     }
   },
   "traceql-issue-detector": {

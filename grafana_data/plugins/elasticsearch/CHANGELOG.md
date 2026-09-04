@@ -1,5 +1,101 @@
 # Changelog
 
+## [12.8.1](https://github.com/grafana/grafana-elasticsearch-datasource/compare/v12.8.0...v12.8.1) (2026-08-27)
+
+
+### 🐛 Bug Fixes
+
+* **e2e:** make the nightly Cloud E2E suite run on the shared instance ([#415](https://github.com/grafana/grafana-elasticsearch-datasource/issues/415)) ([8494bd8](https://github.com/grafana/grafana-elasticsearch-datasource/commit/8494bd8346362fbbd8954db0ae3f3ac17ce94309))
+* **e2e:** resolve the auth state file from GRAFANA_ADMIN_USER ([#413](https://github.com/grafana/grafana-elasticsearch-datasource/issues/413)) ([f1fa900](https://github.com/grafana/grafana-elasticsearch-datasource/commit/f1fa9008cb09be4212a580d26327d3f9cfbe1cdc))
+
+
+### ♻️ Code Refactoring
+
+* resolve typescript-eslint no-deprecated warnings across the frontend ([#408](https://github.com/grafana/grafana-elasticsearch-datasource/issues/408)) ([341448d](https://github.com/grafana/grafana-elasticsearch-datasource/commit/341448dcce7cdc988acbe10194d912c5ebf32e44))
+
+
+### ✅ Tests
+
+* **e2e:** tolerate live ingest and cold starts on the shared instance ([#422](https://github.com/grafana/grafana-elasticsearch-datasource/issues/422)) ([844d2b7](https://github.com/grafana/grafana-elasticsearch-datasource/commit/844d2b74729cf3913ffba68af33f7d6a72c6c643))
+
+
+### 🤖 Continuous Integration
+
+* add a dispatch-only caller for the bundled image pipeline ([#419](https://github.com/grafana/grafana-elasticsearch-datasource/issues/419)) ([b4a5aa1](https://github.com/grafana/grafana-elasticsearch-datasource/commit/b4a5aa15e0fa2c52afef60930a043089ab783ff2))
+* enrol in release-please and conventional commits ([#417](https://github.com/grafana/grafana-elasticsearch-datasource/issues/417)) ([dc2605b](https://github.com/grafana/grafana-elasticsearch-datasource/commit/dc2605b45ca169b41b03feeb74673d6c64128447))
+* onboard to the shared Cloud E2E workflow ([#411](https://github.com/grafana/grafana-elasticsearch-datasource/issues/411)) ([61fcb93](https://github.com/grafana/grafana-elasticsearch-datasource/commit/61fcb937545e9848387a82bdf075a13887c5cbeb))
+
+## 12.8.0
+
+- Feature: Support sum of max and max of max via sibling bucket aggregations [#364](https://github.com/grafana/grafana-elasticsearch-datasource/pull/364)
+- Feature: Add option to preserve the query when switching between query types [#365](https://github.com/grafana/grafana-elasticsearch-datasource/pull/365)
+- Feature: Detect cluster distribution and expose an active instance metric [#368](https://github.com/grafana/grafana-elasticsearch-datasource/pull/368)
+- Feature: Remove `elasticsearchCrossClusterSearch` feature toggle, making cross-cluster search always available [#360](https://github.com/grafana/grafana-elasticsearch-datasource/pull/360)
+- Fix: Stop the health check failing with 410 Gone on Elastic Cloud Serverless [#389](https://github.com/grafana/grafana-elasticsearch-datasource/pull/389)
+- Fix: Keep numeric epoch keys as variable values for date buckets [#407](https://github.com/grafana/grafana-elasticsearch-datasource/pull/407)
+- Fix: Widen auto interval when nested aggregations would exceed `max_buckets` [#386](https://github.com/grafana/grafana-elasticsearch-datasource/pull/386)
+- Fix: Omit empty terms order object rejected by Elasticsearch [#387](https://github.com/grafana/grafana-elasticsearch-datasource/pull/387)
+- Fix: Keep named `buckets_path` references in raw DSL `bucket_script` aggregations [#392](https://github.com/grafana/grafana-elasticsearch-datasource/pull/392)
+- Fix: Stop interval macros consuming parenthesised text in search bodies [#391](https://github.com/grafana/grafana-elasticsearch-datasource/pull/391)
+- Fix: Bound datasource instance gauge label values to known sets [#393](https://github.com/grafana/grafana-elasticsearch-datasource/pull/393)
+- Fix: Restore monospace font in the Lucene query box [#395](https://github.com/grafana/grafana-elasticsearch-datasource/pull/395)
+- Fix(esql): Validate queries before time-range injection can rewrite them [#394](https://github.com/grafana/grafana-elasticsearch-datasource/pull/394)
+- Fix(esql): Detect PromQL metrics queries behind leading comments [#390](https://github.com/grafana/grafana-elasticsearch-datasource/pull/390)
+- Refactor: Use macropro for backend macro interpolation [#367](https://github.com/grafana/grafana-elasticsearch-datasource/pull/367)
+- Chore(e2e): Bump plugin-e2e to 3.10.0 and drop redundant flag override [#401](https://github.com/grafana/grafana-elasticsearch-datasource/pull/401)
+- CI: Add stale issue and PR workflow [#382](https://github.com/grafana/grafana-elasticsearch-datasource/pull/382)
+- CI: Use shared reusable stale workflow [#397](https://github.com/grafana/grafana-elasticsearch-datasource/pull/397)
+- CI: Use shared reusable add-to-project workflow [#398](https://github.com/grafana/grafana-elasticsearch-datasource/pull/398)
+- Dependency updates:
+  - Chore(deps): Bump `@grafana/*` packages to v13.1.1 and update dependencies [#404](https://github.com/grafana/grafana-elasticsearch-datasource/pull/404)
+
+## 12.7.0
+
+- Feature: Remove `elasticsearchRawDSLQuery` and `elasticsearchESQLQuery` feature toggles — raw DSL and ES|QL editors are now always available [#358](https://github.com/grafana/grafana-elasticsearch-datasource/pull/358)
+- Feature: Support PromQL source commands in ES|QL metrics queries [#332](https://github.com/grafana/grafana-elasticsearch-datasource/pull/332)
+- Fix: Migrate legacy variable queries so template variables keep working [#231](https://github.com/grafana/grafana-elasticsearch-datasource/pull/231)
+- Fix: Harden Elasticsearch backend against malformed responses and edge-case aggregations [#345](https://github.com/grafana/grafana-elasticsearch-datasource/pull/345)
+- Fix: Include prereleases when matching ES version against metric ranges [#323](https://github.com/grafana/grafana-elasticsearch-datasource/pull/323)
+- Fix: Load logs volume for raw DSL (Code editor) logs queries [#342](https://github.com/grafana/grafana-elasticsearch-datasource/pull/342)
+- Fix: Align value with `key_as_string` for typed Elasticsearch bucket fields [#324](https://github.com/grafana/grafana-elasticsearch-datasource/pull/324)
+- Fix: Word-wrap long Lucene queries instead of overflowing the input [#349](https://github.com/grafana/grafana-elasticsearch-datasource/pull/349)
+- Fix: Show per-level breakdown in Explore logs volume [#326](https://github.com/grafana/grafana-elasticsearch-datasource/pull/326)
+- Fix(esql): Inject time range when query contains template variables [#340](https://github.com/grafana/grafana-elasticsearch-datasource/pull/340)
+- Refactor: Add frontend query validation layer [#276](https://github.com/grafana/grafana-elasticsearch-datasource/pull/276)
+- Chore: Lock in UTC resolution for hourly index patterns in tests [#325](https://github.com/grafana/grafana-elasticsearch-datasource/pull/325)
+- Chore: Use shared data-sources Renovate base preset [#354](https://github.com/grafana/grafana-elasticsearch-datasource/pull/354)
+- CI: Add add-to-project workflow and remove issue_commands [#352](https://github.com/grafana/grafana-elasticsearch-datasource/pull/352)
+- CI: Update plugin-ci-workflows [#348](https://github.com/grafana/grafana-elasticsearch-datasource/pull/348)
+- Docs: Add signed commits requirement to CONTRIBUTING.md [#351](https://github.com/grafana/grafana-elasticsearch-datasource/pull/351)
+- Dependency updates:
+  - Fix(deps): Update grafana monorepo to v13 [#338](https://github.com/grafana/grafana-elasticsearch-datasource/pull/338)
+  - Chore(deps): Update Node.js to v24.17.0 [#335](https://github.com/grafana/grafana-elasticsearch-datasource/pull/335)
+
+## 12.6.5
+
+- Fix: Preserve Lucene query when switching between metric aggregations [#328](https://github.com/grafana/grafana-elasticsearch-datasource/pull/328)
+- Fix: Make `grafanaDependency` prerelease-inclusive in plugin.json [#314](https://github.com/grafana/grafana-elasticsearch-datasource/pull/314)
+- Perf: Close idle HTTP connections when the datasource is disposed [#274](https://github.com/grafana/grafana-elasticsearch-datasource/pull/274)
+- Chore: Bump grafanaDependency floor to >=12.2.0 [#312](https://github.com/grafana/grafana-elasticsearch-datasource/pull/312)
+- Fix(deps): Update module github.com/grafana/grafana-plugin-sdk-go to v0.292.0 [#302](https://github.com/grafana/grafana-elasticsearch-datasource/pull/302)
+
+## 12.6.4
+
+- Fix: Replace Slate-based QueryField with Input to resolve panel-editor crash on Grafana 13.1+ [#310](https://github.com/grafana/grafana-elasticsearch-datasource/pull/310)
+- Fix: Correctly render multi-field terms breakdown [#282](https://github.com/grafana/grafana-elasticsearch-datasource/pull/282)
+- Chore: Security hardening sweep — dependency, Renovate, and GitHub Actions tightening; clears GO-2026-5026 and GO-2026-4918 [#304](https://github.com/grafana/grafana-elasticsearch-datasource/pull/304)
+- Chore: Auto-audit hygiene fixes — Node `>=24` engines, supply-chain-hardened `.npmrc`, plugin scaffolding refresh [#308](https://github.com/grafana/grafana-elasticsearch-datasource/pull/308)
+- CI: Bump plugin-ci-workflows to v8.0.1 (GATB token migration) [#292](https://github.com/grafana/grafana-elasticsearch-datasource/pull/292)
+- Chore: Run externalised plugin in place of core in docker compose [#275](https://github.com/grafana/grafana-elasticsearch-datasource/pull/275)
+
+## 12.6.3
+
+- Chore: Update Go version to 1.26.3
+
+## 12.6.2
+
+- Chore: Update Go version to 1.26.2
+
 ## 12.6.1
 
 - Chore: Update Go version to 1.26.1

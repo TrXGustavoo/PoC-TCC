@@ -1,0 +1,265 @@
+COORDENADORIA DE ENGENHARIA DE COMPUTAÇÃO
+           
+                                  
+GIOVANA PONTES MERGUIZO
+GUSTAVO FIGUEIREDO PASSOS
+JOÃO LUIZ ORLANDINI ALVES
+ARQUITETURA DE COLETA E ANÁLISE DE AMEAÇAS EM TEMPO REAL: IMPLEMENTAÇÃO DE HONEYPOTS EMBARCADOS PARA GERAÇÃO DE THREAT INTELLIGENCE
+SOROCABA, SP
+2026
+GIOVANA PONTES MERGUIZO
+GUSTAVO FIGUEIREDO PASSOS
+JOÃO LUIZ ORLANDINI ALVES
+ 
+ 
+ARQUITETURA DE COLETA E ANÁLISE DE AMEAÇAS EM TEMPO REAL: IMPLEMENTAÇÃO DE HONEYPOTS EMBARCADOS PARA GERAÇÃO DE THREAT INTELLIGENCE
+Trabalho de conclusão de curso apresentado ao Centro Universitário Facens como exigência parcial para obtenção do diploma de graduação em Engenharia de Computação.
+Orientador(a): Profª. Drª. Andréia Damasio de Leles.
+SOROCABA, SP 
+2026
+FICHA CATALOGRÁFICA ELABORADA 
+PELA “BIBLIOTECA FACENS”
+C198q           Campos, Rodrigo Guimarães.        A questão da sustentabilidade na era do consumo / por Rodrigo Guimarães Campos, Diogo Satilio Carvalho Pinho, Jéssica Martins Vieira – Sorocaba, SP: [s.n.], 2020.                  32f.       Trabalho de Conclusão de Curso (Graduação) – Centro Universitário Facens – Curso de Engenharia Civil, 2020.           	    Orientador: Prof.(a) Dr.(a) Eliane da Rocha        1. Sustentabilidade. 2. Era do consumo. 3. Consumismo.  I. Pinho, Diogo Satilio Carvalho. II. Vieira, Jéssica Martins. III.    Centro Universitário Facens. IV. Título. CDD 363.7
+C198q 
+          Campos, Rodrigo Guimarães. 
+       A questão da sustentabilidade na era do consumo / por Rodrigo Guimarães Campos, Diogo Satilio Carvalho Pinho, Jéssica Martins Vieira – Sorocaba, SP: [s.n.], 2020. 
+                 32f.
+       Trabalho de Conclusão de Curso (Graduação) – Centro Universitário Facens – Curso de Engenharia Civil, 2020. 
+          	    Orientador: Prof.(a) Dr.(a) Eliane da Rocha 
+       1. Sustentabilidade. 2. Era do consumo. 3. Consumismo. 
+ I. Pinho, Diogo Satilio Carvalho. II. Vieira, Jéssica Martins. III.    Centro Universitário Facens. IV. Título. 
+CDD 363.7
+GIOVANA PONTES MERGUIZO
+GUSTAVO FIGUEIREDO PASSOS
+JOÃO LUIZ ORLANDINI ALVES
+                                                                    
+ARQUITETURA DE COLETA E ANÁLISE DE AMEAÇAS EM TEMPO REAL: IMPLEMENTAÇÃO DE HONEYPOTS EMBARCADOS PARA GERAÇÃO DE THREAT INTELLIGENCE 
+Trabalho de conclusão de curso apresentado ao Centro Universitário Facens como exigência parcial para obtenção do certificado de conclusão do curso de Engenharia de Computação.
+Orientador(a): Profª. Drª. Andréia Damasio de Leles.
+BANCA EXAMINADORA 
+Prof. Apolônio Gregório dos Santos
+Afiliação (Centro Universitário Facens)
+Prof. Elizeu Leite Guimarães
+Afiliação (Centro Universitário Facens)
+Prof.ª Odília dos Santos Campos
+Afiliação (Centro Universitário Facens)
+                                               
+Dedico este trabalho a todos que fizeram parte desta jornada de desenvolvimento profissional, e aos que contribuíram, direta ou indiretamente, para que meu objetivo fosse alcançado com sucesso, em meio a um processo permeado por alegrias.
+AGRADECIMENTOS                                                  
+Agradeço a esta instituição de ensino por me preparar para o mercado de trabalho, a todos os professores, coordenadores, colegas de classe e funcionários em geral que de alguma forma estiveram comigo nesta trajetória.
+Aos meus familiares, que depositaram muita confiança e credibilidade em mim e em meus planos.
+Aos orientadores pelo incentivo disponibilizado, ao tempo doado para que eu pudesse encontrar a melhor forma de concluir o meu projeto.
+A todos integrantes da biblioteca da faculdade pela atenção e carinhoso suporte.
+E, em especial, a agência fomentadora XYZ pelo apoio financeiro que me propiciou uma excelente pesquisa, para que eu pudesse encontrar os resultados desejados. 
+Meus sinceros agradecimentos.
+“Sustentabilidade é a equação entre o que você poupa e o que você desperdiça”.
+     Luis Nykyson Lisboa Pinheiro
+RESUMO
+Questão antiga e que é refletida de forma mais incessante nos dias atuais: sustentabilidade - diante do aumento do consumo/consumismo. Apresenta-se, no decorrer do trabalho, as consequências do consumo desregulado e os fatores que são impactados diretamente. Em contrapartida, elaborou-se algumas práticas corretas que podem ser adotadas no dia a dia para amenizar as mazelas ao meio ambiente como um todo e tornar o 1º R – Repensar - um ato cotidiano antes de realizar as compras. Mostra a diferença entre ação de consumir e o ato do consumismo. Tem-se como objetivo explicitar a problemática do equilíbrio no ato de comprar em prol da proteção ambiental. Para o desenvolvimento do texto, utilizou-se a metodologia de levantamento bibliográfico cujos textos têm a mesma perspectiva com um recorte no tempo de publicação da pesquisa últimos 10 anos. A conclusão está voltada à redução de compras não necessárias e da aquisição de hábitos conscientes, que provoquem, em si e no outro, uma maior valorização dos recursos naturais.
+Palavras-chave: Sustentabilidade. Consumismo. Consumo Consciente. 
+ABSTRACT
+An old issue that is reflected more incessantly nowadays: sustainability - in the face of increased consumption/consumerism. Throughout the work, the consequences of unregulated consumption and the factors that are directly impacted are presented. On the other hand, some correct practices were elaborated that can be adopted on a daily basis to mitigate the damage to the environment as a whole and make the 1st R - Rethink - a daily act before making purchases. It shows the difference between the action of consuming and the act of consumerism. It aims to explain the problem of balance in the act of buying for the sake of environmental protection. For the development of the text, we used the methodology of bibliographic survey whose texts have the same perspective with a cut in the time of publication of the research last 10 years. The conclusion is focused on the reduction of unnecessary purchases and the acquisition of conscious habits, which cause, in oneself and in others, a greater appreciation of natural resources.
+Keywords: Sustainability. Consumerism. Conscious Consumption.
+LISTA DE ILUSTRAÇÕES
+FIGURA 1.  Pilares da Segurança da Informação17
+FIGURA 2.  Protocolos de Comunicação IoT18
+FIGURA 3.  Botnets 20
+FIGURA 4.  Ataque DDoS 21
+FIGURA 5.  Exemplo operacional de um Honeypot  22
+FIGURA 6.  Cinco etapas de produção de inteligência 24
+LISTA DE SIGLAS
+C2Command and Control
+CoAPConstrained Application Protocol
+DDoSDistributed Denial of Service
+HTTPHypertext Transfer Protocol
+IoCsIndicators of Compromise 
+IoTInternet of Things
+MQTTMessage Queuing Telemetry Transport 
+OTAOver-the-Air
+SIEMSecurity Information and Event Management
+SSHSecure Shell
+TITecnologia da Informação
+SUMÁRIO
+1 INTRODUÇÃO14
+2 SEGURANÇA EM AMBIENTES IOT E INTELIGÊNCIA DE AMEAÇAS17
+2.1 INTERNET DAS COISAS (IOT)17
+2.2 AMEAÇAS AUTOMATIZADAS: BOTNETS E ATAQUES DDOS19
+2.3 HONEYPOTS E O SOFTWARE COWRIE21
+2.4 INTELIGÊNCIA DE AMEAÇAS (THREAT INTELLIGENCE)23
+2.5 TRABALHOS CORRELATOS24
+3 METODOLOGIA27
+3.1 CARACTERIZAÇÃO DA PESQUISA27
+3.2 ESTUDO DE CASO27
+4 DESENVOLVIMENTO E ARQUITETURA28
+4.1 IMPLANTAÇÃO NO HARDWARE DE BORDA (RASPBERRY PI)28
+4.2 ESTRUTURAÇÃO DA PIPELINE DE DADOS28
+4.3 MECANISMOS DE OBSERVABILIDADE (GRAFANA)28
+4.4 NOTIFICAÇÕES E ALERTAS OPERACIONAIS PARA TI28
+5 RESULTADOS E DISCUSSÕES29
+5.1 VALIDAÇÃO DA CAPTURA NO CENÁRIO OPERACIONAL FÍSICO29
+5.2 ANÁLISE DAS MÉTRICAS DE ATAQUE COLETADAS29
+5.3 EXTRAÇÃO E AVALIAÇÃO DE IOCs29
+5.4 AVALIAÇÃO DOS DASHBOARDS E MECANISMOS DE ALERTA29
+5.5 ANÁLISE DA GERAÇÃO DE THREAT INTELLIGENCE29
+5.6 LIMITAÇÕES29
+6 CONSIDERAÇÕES FINAIS30
+REFERÊNCIAS31
+1 INTRODUÇÃO
+A segurança da informação tem se tornado um dos principais desafios da era digital, especialmente com o crescimento acelerado da Internet of Things (IoT). De forma geral, a Internet das Coisas refere-se à rede de objetos e dispositivos conectados capazes de coletar e transmitir dados por meio da internet (SAP, 2026). Em sua totalidade, essa expansão tecnológica tem proporcionado benefícios operacionais e estratégicos, porém também introduz vulnerabilidades relevantes que podem ser exploradas por agentes maliciosos.
+Como benefícios, a IoT oferece o aumento da eficiência e produtividade empresarial, a possibilidade de tomada de decisão baseada em dados, a melhoria da experiência do usuário e a redução de custos por meio da automação de processos repetitivos. No entanto, ela também apresenta riscos de segurança e privacidade, incluindo a vulnerabilidade a hackers e outras ameaças cibernéticas (IBM, 2026).
+Assim, esses dispositivos, muitas vezes desenvolvidos com foco em baixo custo e rápida implementação, apresentam falhas de segurança, como credenciais padrão, serviços expostos e ausência de atualizações de firmware (OWASP, 2023). Como consequência, tornam-se alvos frequentes de ataques automatizados, sendo amplamente utilizados na formação de botnets.
+Nesse cenário, uma botnet consiste em uma rede de dispositivos sequestrados (zumbis) que, após serem infectados por um malware, passam a ser controlados remotamente de forma coordenada por um atacante. Esses exércitos de dispositivos IoT comprometidos são frequentemente utilizados para orquestrar Ataques de Negação de Serviço Distribuída (DDoS), cujo objetivo é enviar um volume massivo de solicitações para sobrecarregar servidores e redes alvo, tornando serviços essenciais indisponíveis para os usuários legítimos (Kolias; Kambourakis; Stavrou; Voas, 2017).
+Nesse contexto, observa-se que um dos principais problemas enfrentados na área de segurança cibernética está na limitação de visibilidade sobre as ações dos atacantes em tempo real, agravada pela falta de dados estruturados, como logs e arquivos JSON padronizados, o que dificulta a identificação de padrões e tendências das ameaças emergentes.
+Diante dessa lacuna, surgem os Honeypots, que de acordo com Marcelo e Pitanga (2003), são sistemas que possuem falhas de segurança reais ou virtuais, configuradas de maneira proposital, a fim de que sejam invadidos e de que os resultados dessas invasões possam ser estudados. Ou seja, apresentam-se como uma solução relevante para simular ambientes vulneráveis com o objetivo de atrair e registrar atividades maliciosas (Ferreira; Nunes; Café; Júnior, 2023).
+Em virtude disso, o presente projeto tem como objetivo geral desenvolver uma arquitetura de coleta e análise de ameaças em tempo real, por meio da implementação de um honeypot de média interação voltado para ambientes IoT. Como objetivos específicos, busca-se projetar um ambiente controlado para captura de ataques, validar a solução em hardware de baixo custo e estruturar um pipeline de análise de dados gerados pelas invasões para gerenciar e fornecer alertas e métricas de forma fluida.
+A escolha deste tema justifica-se pela crescente relevância da segurança em ecossistemas IoT, considerando o impacto que ataques cibernéticos podem causar em infraestruturas críticas e serviços essenciais. Sua abrangência é significativa, uma vez que contribui tanto para o avanço acadêmico quanto para aplicações práticas na indústria. Além disso, a geração de Threat Intelligence baseada em dados reais permite uma compreensão mais aprofundada das estratégias utilizadas por agentes maliciosos (Azevedo; Giozza; Mendonça; Silva Filho; Sousa Júnior; Albuquerque, 2019; Vieira, 2025). 
+No que se refere à metodologia, este trabalho caracteriza-se como uma pesquisa aplicada, com abordagem exploratória e experimental. Inicialmente, realiza-se uma revisão bibliográfica embasada em autores e estudos relevantes sobre honeypots, segurança em IoT e ataques distribuídos, a fim de estabelecer o embasamento teórico necessário para o desenvolvimento da proposta.
+Em seguida, será projetada uma arquitetura de laboratório virtualizado para a implementação e validação do honeypot, utilizando o software Cowrie (Oosterhof, 2025) como base para emulação de serviços vulneráveis. Neste ambiente, serão realizados testes controlados, incluindo simulações de ataques e varreduras automatizadas, com o objetivo de avaliar a capacidade do sistema em capturar e registrar eventos de forma eficiente antes de sua aplicação física.
+Por fim, a solução será migrada para um ambiente de hardware físico, utilizando um microcomputador de baixo custo, como o Raspberry Pi, validando a implementação em um cenário mais próximo da realidade operacional. Para complementar a coleta, essa arquitetura será integrada a um pipeline de análise de dados, adotando ferramentas de monitoramento e visualização de métricas, como o Grafana, para estruturação de dashboards interativos. Dessa forma, será possível correlacionar eventos, identificar padrões de ataque e extrair Indicadores de Comprometimento (IoCs), transformando dados brutos em informações relevantes para a segurança.
+Visando um escopo inovador, o projeto também investigará a viabilidade de aplicar técnicas de análise avançada de dados englobando conceitos de inteligência artificial ou aprendizado de máquina para explorar o potencial de previsibilidade de ataques e o suporte na mitigação de ameaças.
+Para garantir a clareza metodológica, este trabalho está estruturado em seis capítulos principais. Inicialmente, tem-se a introdução. O Capítulo 2 abordará os fundamentos teóricos essenciais sobre Segurança, IoT, Botnets e Honeypots. O Capítulo 3 detalha a metodologia e a concepção da arquitetura lógica do projeto. O Capítulo 4 apresentará o desenvolvimento prático, incluindo a implantação no hardware e as estratégias de integração de dados. O Capítulo 5 será dedicado à apresentação dos resultados, com foco nas métricas coletadas, nos mecanismos de notificação estruturados e nas discussões sobre as explorações analíticas propostas. Por fim, no Capítulo 6, serão apresentadas as considerações finais, as limitações do estudo e as perspectivas para trabalhos futuros.
+2 SEGURANÇA EM AMBIENTES IOT E INTELIGÊNCIA DE AMEAÇAS
+A Segurança da Informação pode ser definida como um conjunto de procedimentos e ferramentas para proteção de dados e infraestrutura contra acessos, usos ou modificações não autorizadas, operando estruturalmente sob a tríade da confidencialidade, integridade e disponibilidade (MICROSOFT, 2026), assim como pode ser observado na Figura 1 as definições detalhadas.
+Figura 1 - Pilares da Segurança da Informação
+Fonte: Disponível em: https://www.xlabs.com.br/. Acesso em: 20 ago. 2026.
+No cenário tecnológico contemporâneo, a manutenção desses pilares tornou-se um desafio altamente complexo devido à dissolução dos perímetros de rede tradicionais. As defesas estáticas, antes restritas a ambientes corporativos bem delimitados, agora precisam lidar com uma superfície de ataque difusa e em expansão exponencial. Assim, a segurança da informação tem se tornado um dos principais desafios da era digital, especialmente com o crescimento acelerado da Internet das Coisas (IoT).
+Dentro desse contexto, surgem os ataques cibernéticos que consistem em ações que visam prejudicar um sistema, aproveitando vulnerabilidades por meio de diversas ferramentas e técnicas. Esses ataques podem ocorrer para diferentes objetivos, como ganho financeiro, auto contentamento ou motivos políticos. Diante disso, entre os ataques mais comuns estão os botnets e ataques DDoS (negação de serviço distribuído) (Mendes, 2023).
+2.1 INTERNET DAS COISAS (IOT)
+A Internet das Coisas, também chamada de IoT, pode ser compreendida como um ecossistema distribuído composto por dispositivos físicos interconectados, capazes de coletar, transmitir e processar dados em diferentes camadas de rede (SAP, 2026). Esses dispositivos operam sob arquiteturas baseadas em três camadas principais, são elas: percepção, rede e aplicação (Al-Fuqaha; Guizani; Mohammadi; Aledhari; Ayyash, 2015).
+Nesse contexto, a camada de percepção é responsável pela coleta de dados por meio de sensores, enquanto a camada de rede realiza a transmissão dessas informações por protocolos de comunicação como MQTT, HTTP e CoAP (Figura 2). Por fim, a camada de aplicação processa e utiliza esses dados para geração de valor, frequentemente integrando sistemas de análise e plataformas de visualização.
+Figura 2 - Protocolos de Comunicação IoT
+Fonte: Disponível em: https://eosiberica.pt/. Acesso em: 15 abr. 2026.
+Contudo, a heterogeneidade desses dispositivos e a limitação de recursos computacionais como memória, capacidade de processamento e consumo energético impõem restrições à implementação de mecanismos robustos de segurança, criando um ambiente propício para exploração de vulnerabilidades (IBM, 2026).
+Dessa forma, os ataques em ambientes IoT são significativamente ampliados devido à quantidade massiva de dispositivos conectados e à exposição contínua à internet (Azevedo; Giozza; Mendonça; Silva Filho; Sousa Júnior; Albuquerque, 2019). Tornando cada dispositivo um potencial ponto de entrada para agentes maliciosos, especialmente quando configurado de forma inadequada.
+Entre os principais vetores de ataque, destacam-se serviços expostos, portas abertas e interfaces de administração remota. Simultaneamente, protocolos como Telnet e SSH, frequentemente utilizados em dispositivos IoT, tornam-se alvos recorrentes de ataques automatizados, principalmente quando protegidos por credenciais fracas ou padrão (OWASP, 2023).
+Além disso, a ausência de segmentação de rede e a falta de monitoramento contínuo contribuem para a propagação lateral de ataques, permitindo que um único dispositivo comprometido sirva como ponto de partida para a contaminação de toda a rede.
+As vulnerabilidades estruturais em dispositivos IoT estão diretamente relacionadas ao seu ciclo de desenvolvimento e às limitações de segurança embarcadas. De acordo com a Kolias, Kambourakis, Stavrou e Voas (2017), falhas comuns incluem armazenamento inseguro de credenciais, firmware desatualizado e ausência de mecanismos de autenticação robustos.
+Outro fator crítico é a utilização de credenciais hardcoded, que permanecem inalteradas após a implantação do dispositivo. Esse tipo de vulnerabilidade permite ataques, executados por scripts automatizados que testam combinações conhecidas de usuário e senha. Adicionalmente, a falta de mecanismos de atualização remota (OTA - Over-the-Air) dificulta a correção de falhas após a implantação, mantendo os dispositivos expostos por longos períodos (OWASP, 2023).
+2.2 AMEAÇAS AUTOMATIZADAS: BOTNETS E ATAQUES DDOS
+Os modelos de ameaça em ambientes IoT envolvem a exploração de vulnerabilidades em larga escala por meio de automação. Ataques são frequentemente conduzidos por bots capazes de realizar varreduras massivas na internet, identificando dispositivos vulneráveis em questão de segundos.
+Entre os principais tipos de ataque, destacam-se a exploração de serviços expostos, ataques de força bruta, injeção de comandos e execução remota de código. Esses ataques são frequentemente utilizados como etapa inicial para comprometimento do dispositivo e posterior inclusão em botnets (Kolias; Kambourakis; Stavrou; Voas, 2017). Sendo assim, a automatização desses processos reduz significativamente o custo operacional dos ataques, permitindo que agentes maliciosos comprometam milhares de dispositivos simultaneamente.
+Segundo Candido (2019), uma botnet pode ser definida como uma rede de computadores infectados por um mesmo malware com o intuito malicioso (Figura 3). Dentro deste conceito, existe a IoT botnet que possui a capacidade de permitir o atacante controlar de forma remota dispositivos IoT infectados, permitindo, por exemplo, a realização de um ataque DDoS gerado a partir dos bots. Além disso, a escala desses ataques é ampliada pela grande quantidade de dispositivos IoT vulneráveis disponíveis na internet (Kolias; Kambourakis; Stavrou; Voas, 2017).
+Figura 3 - Botnets
+Fonte: Disponível em: https://www.a10networks.com/. Acesso em: 15 abr. 2026.
+Nesse sentido, Botnets baseadas em IoT consistem em redes distribuídas de dispositivos comprometidos, controlados remotamente por meio de servidores de comando e controle (C2 - Command and Control). Após a infecção, os dispositivos passam a executar comandos de forma coordenada, sem o conhecimento do usuário.
+Em suma, os ataques DDoS (Distributed Denial of Service) têm como objetivo esgotar os recursos computacionais de um sistema alvo, tornando-o indisponível para usuários legítimos. Esses ataques são caracterizados pela utilização de diversos computadores ou dispositivos que fazem o envio massivo de requisições simultâneas a partir de múltiplas origens em direção a um alvo, com diversos dispositivos escravizados (zumbis), lançando esses pacotes para o sistema, multiplicando a efetividade da incapacitação do dispositivo, conforme demonstrado na Figura 4 (Candido, 2019).
+Figura 4 - Ataque DDoS
+Fonte: Candido, 2019, p. 19.
+Dessa forma, todos os IoT botnets agem de maneira parecida, invadindo os dispositivos não seguros para posteriormente transformá-los em um zumbi, capaz de gerar o ataque DDoS. Este que é potencializado pela utilização de dispositivos comprometidos, que atuam como fontes de tráfego malicioso. Esse tipo de ataque pode impactar servidores, aplicações web e infraestruturas críticas (Kolias; Kambourakis; Stavrou; Voas, 2017). Sendo assim, a eficiência desses ataques está diretamente relacionada à capacidade de coordenação da botnet e ao volume de dispositivos participantes.
+2.3 HONEYPOTS E O SOFTWARE COWRIE
+Os Honeypots são sistemas projetados para simular ambientes vulneráveis, ficando expostos a ataques, com o objetivo de atrair e registrar atividades maliciosas. Diferentemente de sistemas de defesa tradicionais, os honeypots não bloqueiam ataques, mas os observam e registram para análise posterior (Ferreira; Nunes; Café; Júnior, 2023). Dessa forma, podem distrair os atacantes das máquinas mais importantes do sistema e alertar o administrador do sistema sobre um ataque, além de permitir uma análise detalhada do atacante durante e após o ataque (Figura 5).
+Figura 5 - Exemplo operacional de um Honeypot 
+Fonte: Disponível em: https://tssc.mx/EN/index.php. Acesso em: 14 abr. 2026. 
+Esses sistemas desempenham papel fundamental na geração de Threat Intelligence, permitindo a coleta de dados reais sobre comportamento de atacantes, técnicas utilizadas e padrões de exploração (Azevedo; Giozza; Mendonça; Silva Filho; Sousa Júnior; Albuquerque, 2019). Além disso, honeypots possibilitam a criação de bases de dados estruturadas, essenciais para análise estatística e aplicação de técnicas de aprendizado de máquina.
+Os honeypots podem ser classificados de acordo com o grau de interatividade entre o sistema e o atacante. São eles, Honeypots de baixa interação que simulam serviços de forma limitada, enquanto os de alta interação oferecem ambientes completos, compostos por sistemas reais, permitindo a execução real de comandos, por exemplo. (Mendes, 2023)
+Já os honeypots de média interação, como o Cowrie, representam um equilíbrio entre segurança e capacidade de coleta de dados. Eles permitem capturar comandos e interações sem expor completamente o sistema hospedeiro. Assim, essa abordagem reduz riscos operacionais ao mesmo tempo em que mantém a eficiência na captura de dados relevantes.
+Além disso, existem os honeypots virtuais que são compostos por sistemas simulados executados em máquinas virtuais, com maior facilidade de implementação e gerenciamento, menor custo, maior simplicidade para realizar replicação e distribuição geográfica, e os físicos que são os dispositivos reais implantados em uma rede (Costa, 2025).
+O Cowrie (Oosterhof, 2025) é um honeypot virtual de média interação especializado na emulação de serviços SSH e Telnet, amplamente utilizados em dispositivos IoT. Ele registra tentativas de autenticação, comandos executados e sessões completas de ataque.
+Após a coleta de dados, estes são armazenados em formatos estruturados, como logs e arquivos JSON, permitindo fácil integração com sistemas de análise e ferramentas de visualização. Assim, essa capacidade de geração de telemetria detalhada torna o Cowrie uma ferramenta essencial para estudos de segurança e análise de comportamento de atacantes. 
+Dessa maneira, o uso de honeypots na área da segurança da informação para fins de pesquisa, desenvolvimento e aprimoramento de ferramentas e métodos de proteção torna-se um mecanismo de extrema importância (Costa, 2025).
+2.4 INTELIGÊNCIA DE AMEAÇAS (THREAT INTELLIGENCE)
+A Inteligência de Ameaças, comumente conhecida por Threat Intelligence, consiste na coleta, análise e interpretação de dados relacionados a ameaças cibernéticas, com o objetivo de fazer a criação de insights e apoiar decisões estratégicas de segurança (Azevedo; Giozza; Mendonça; Silva Filho; Sousa Júnior; Albuquerque, 2019).
+No contexto de IoT, a geração de inteligência de ameaças permite identificar padrões de ataque, mapear origens geográficas e extrair Indicadores de Comprometimento (IoCs), como endereços IP, credenciais utilizadas e tipos de payload.
+De acordo com Vieira (2025), os Indicadores de Comprometimento (IoCs) são evidências digitais que apontam para a possível ocorrência de uma violação de segurança em sistemas, redes ou dispositivos. Esses artefatos são fundamentais para identificar as ações de um invasor, facilitando tanto a detecção de incidentes em tempo real quanto a análise retrospectiva de ataques. Desse modo, os IoCs permitem que os profissionais de segurança cibernética detectem, investiguem e respondam  mais eficazmente a atividades maliciosas.
+Além disso, os IoCs podem assumir diferentes formas. Eles permitem a criação de regras de segurança específicas que ajudam a identificar padrões conhecidos de ameaças. Assim, esses indicadores são utilizados em ferramentas de segurança como, por exemplo, as plataformas de Inteligência de Ameaças.
+Para isso, pode ser adotada cinco etapas para o processo de produção de Inteligência de Ameaças (Figura 6). A primeira etapa consiste na coleta de dados provenientes de múltiplas fontes, internas ou externas. Com um corpo inicial de dados, é realizado o processamento com a formatação e combinação dos registros para torná-los coerentes e prontos para uso. Em seguida, é necessário a análise conjunta dos dados e informações para descobrir padrões, inferir tendências ou relacionar dados a atores de ameaças específicas. Posteriormente, pode-se implementar a inteligência obtida em sistemas de defesa. E por fim, é possível expandir o conhecimento consolidado por meio do compartilhamento sistemático com as partes interessadas.
+Figura 6 - Cinco etapas de produção de inteligência
+Fonte: Vieira, 2025, p. 12.
+Com a adoção dessas cinco etapas (Figura 6), é possível criar pipelines de dados e utilizar ferramentas de visualização, como dashboards, para transformar dados brutos em informações acionáveis, contribuindo para a antecipação de ataques e fortalecimento da segurança.
+2.5 TRABALHOS CORRELATOS
+A pesquisa e o desenvolvimento na área de segurança cibernética e, mais especificamente, na implementação de honeypots para a geração de Threat Intelligence em ambientes IoT, têm sido objeto de crescente interesse. Esta seção visa apresentar e discutir estudos e projetos anteriores que compartilham similaridades conceituais ou metodológicas com a presente proposta. 
+Dessa forma, foi realizado um levantamento bibliográfico de abordagens recentes envolvendo segurança em IoT, honeypots e inteligência de ameaças. O Quadro 1 apresenta um quadro comparativo (benchmarking) destacando as características estruturais de trabalhos correlatos em relação à arquitetura desenvolvida no presente trabalho.
+Quadro 1 - Comparação de características entre trabalhos correlatos
+Características Analisadas
+Azevedo (2019)
+Mendes (2023)
+Costa (2025)
+O trabalho atual (2026)
+Foco Principal
+Modelo de Threat Intelligence
+Infraestrutura para Honeypots
+Honeypots para Câmera IoT
+Honeypot embarcado para Threat Intelligence
+Honeypot
+N/A
+Múltiplos
+Cowrie
+Cowrie
+Infraestrutura
+Corporativo / SIEM
+Nuvem (Cloud)
+Nuvem (Cloud)
+Hardware de borda (Raspberry Pi)
+Visualização de dados (dashboards)
+Sim
+Não detalhado
+Parcial
+Sim
+IoCs
+Teórico
+Não detalhado
+Parcial
+Sim
+Alertas Operacionais
+N/A
+Não
+Não
+Sim
+IoT
+Não
+Sim
+Sim
+Sim
+Threat Intelligence
+Sim
+Não
+Não
+Sim
+Inteligência Artificial
+Não
+Não 
+Não
+Sim
+Fonte: elaborado pelos autores, 2026.
+Conforme observado no Quadro 1, embora a literatura apresente estudos robustos sobre Threat Intelligence (Azevedo; Giozza; Mendonça; Silva Filho; Sousa Júnior; Albuquerque, 2019) e a utilização do Cowrie para proteção de dispositivos específicos (Costa, 2025), nota-se uma predominância de implantações baseadas em infraestrutura de nuvem ou frotas corporativas. O presente trabalho preenche uma lacuna prática ao trazer a validação estrutural do honeypot diretamente para um hardware de borda de baixo custo (Raspberry Pi), integrando a captura automatizada do Cowrie com um pipeline avançado de observabilidade no Grafana e Zabbix, permitindo a extração visual e contínua de Indicadores de Comprometimento (IoCs).
+3 METODOLOGIA
+Este capítulo apresenta os procedimentos metodológicos adotados para o desenvolvimento e a avaliação da arquitetura de coleta e análise de ameaças em tempo real proposta neste trabalho. A metodologia foi definida a partir do problema de pesquisa relacionado à baixa visibilidade sobre as ações de agentes maliciosos em ambientes IoT e a necessidade de transformar registros brutos de ataques em informações estruturadas e úteis para a geração de Threat Intelligence. Nesse sentido, o método contempla o levantamento teórico, a concepção da arquitetura, a implementação do ambiente, a coleta das evidências, os testes de funcionamento e a análise dos resultados obtidos.
+3.1 CARACTERIZAÇÃO DA PESQUISA
+Quanto à natureza, o presente trabalho caracteriza-se como uma pesquisa aplicada, pois busca produzir conhecimento direcionado à solução de um problema concreto de segurança cibernética. A proposta não se restringe à discussão conceitual sobre ameaças em dispositivos IoT, uma vez que envolve a construção de uma solução prática para capturar, estruturar, monitorar e interpretar eventos associados a tentativas de invasão. O resultado esperado consiste em uma arquitetura funcional, implementada inicialmente em ambiente controlado e posteriormente validada em hardware de baixo custo.
+Em relação à abordagem do problema, a pesquisa é quali-quantitativa. O aspecto quantitativo está associado à mensuração dos eventos registrados pelo honeypot, incluindo volumes de conexões, tentativas de autenticação, endereços de origem, portas e serviços acessados, comandos executados, sessões capturadas, frequência dos eventos e consumo de recursos computacionais. Essas informações permitirão a realização de contagens, comparações e análises temporais por meio de métricas e dashboards. O aspecto qualitativo, por sua vez, será empregado na interpretação do comportamento observado nas sessões, dos comandos e payloads registrados, dos padrões de exploração e da relevância dos Indicadores de Comprometimento extraídos. As duas abordagens serão utilizadas de forma complementar para compreender não apenas a quantidade de eventos, mas também o significado das ações identificadas no contexto estudado.
+Quanto aos objetivos, a pesquisa possui caráter exploratório e descritivo. É exploratória porque busca ampliar a familiaridade com a implantação de honeypots de média interação em dispositivos embarcados e investigar a viabilidade de integrar os dados coletados a mecanismos de monitoramento, visualização e alerta. Também possui caráter descritivo, uma vez que pretende registrar e apresentar as características dos eventos observados, o comportamento da arquitetura, os tipos de interação capturados e as relações identificadas entre os dados coletados. Não se pretende estabelecer relações causais definitivas sobre a ocorrência global de ataques, mas descrever o funcionamento e os resultados da solução dentro das condições definidas para o projeto.
+No que se refere aos procedimentos técnicos, serão combinadas pesquisa bibliográfica, experimentação e estudo de caso. A pesquisa bibliográfica fornece a fundamentação sobre segurança da informação, IoT, botnets, ataques DDoS, honeypots, Cowrie, Indicadores de Comprometimento e Threat Intelligence. A etapa experimental compreende a configuração do ambiente, a execução de simulações controladas, a alteração de parâmetros e a verificação do comportamento dos componentes. Por fim, o estudo de caso delimita a investigação à implementação da arquitetura proposta em um cenário específico, permitindo acompanhar de forma detalhada sua implantação, operação, avaliação e capacidade de geração de informações relevantes.
+3.2 ESTUDO DE CASO
+O estudo de caso será conduzido a partir da implementação de um honeypot virtual de média interação, baseado no software Cowrie, integrado a uma arquitetura de coleta, processamento, monitoramento e visualização de dados. O objeto analisado será o funcionamento desta arquitetura em um microcomputador Raspberry Pi, utilizado como plataforma embarcada de baixo custo e representativa das limitações de processamento, memória e armazenamento encontradas em dispositivos de borda. A unidade de análise será a arquitetura completa, considerando desde a recepção de uma tentativa de acesso até o registro do evento, sua disponibilização para consulta e a geração de métricas e alertas.
+4 DESENVOLVIMENTO E ARQUITETURA
+4.1 IMPLANTAÇÃO NO HARDWARE DE BORDA (RASPBERRY PI)
+4.2 ESTRUTURAÇÃO DA PIPELINE DE DADOS
+4.3 MECANISMOS DE OBSERVABILIDADE (GRAFANA)
+4.4 NOTIFICAÇÕES E ALERTAS OPERACIONAIS PARA TI
+5 RESULTADOS E DISCUSSÕES
+5.1 VALIDAÇÃO DA CAPTURA NO CENÁRIO OPERACIONAL FÍSICO
+5.2 ANÁLISE DAS MÉTRICAS DE ATAQUE COLETADAS
+5.3 EXTRAÇÃO E AVALIAÇÃO DE IOCs
+5.4 AVALIAÇÃO DOS DASHBOARDS E MECANISMOS DE ALERTA
+5.5 ANÁLISE DA GERAÇÃO DE THREAT INTELLIGENCE
+5.6 LIMITAÇÕES
+6 CONSIDERAÇÕES FINAIS
+REFERÊNCIAS
+AL-FUQAHA, A.; GUIZANI, M.; MOHAMMADI, M.; ALEDHARI, M.; AYYASH, M. Internet of things: A survey on enabling technologies, protocols, and applications. IEEE Communications Surveys & Tutorials, v. 17, n. 4, p. 2347-2376, 2015. DOI: 10.1109/COMST.2015.2444095. Disponível em: https://ieeexplore.ieee.org/document/7123563. Acesso em: 13 abr. 2026.
+AZEVEDO, B. W. P.; GIOZZA, W. F.; MENDONÇA, F. L. L. de; SILVA FILHO, D. A. da; SOUSA JÚNIOR, R. T. de; ALBUQUERQUE, R. de O. Proposta de modelo de referência de inteligência de ameaças. In: CONFERÊNCIAS IADIS IBERO-AMERICANAS WWW/INTERNET E COMPUTAÇÃO APLICADA, 17., 2019, Lisboa. Atas [...]. Lisboa: IADIS, 2019. Disponível em: https://www.researchgate.net/profile/Robson-Albuquerque/publication/338483533_PROPOSTA_DE_MODELO_DE_REFERENCIA_DE_INTELIGENCIA_DE_AMEACAS/links/5e171d36299bf10bc39e21d0/PROPOSTA-. Acesso em: 13 mar. 2026.
+CANDIDO, Fernando Antônio Stark. DDoS em IOT: uma revisão da literatura. 2019. Trabalho de Conclusão de Curso (Graduação em Redes de Computadores) – Faculdade de Tecnologia Alcides Maya, Porto Alegre, 2019.
+COSTA, Huryel Souto. Construção de Honeypot para câmeras IoT usando computação em nuvem. 2025. 47f. Trabalho de Conclusão de Curso (Graduação em Ciência da Computação) – Universidade Federal de Uberlândia, Uberlândia, 2025.
+FERREIRA, L. V. A; NUNES, R. R.; CAFÉ, D. C.; JÚNIOR, R. T. de S. Uso de honeypots na detecção de rootkits de malware: proposta de uma agenda de pesquisa. Revista Ibérica de Sistemas e Tecnologias de Informação, n. E60, p. 179-192, 2023.
+GONÇALVES, Pamela Moura; SANTOS, Fabiano da Silva; CHEMELLO, Fernando Guerreiro; LUNARDI, Roben Castagna. Avaliação e comparação de honeypots: auxiliando administradores de rede na escolha e adoção. In: ESCOLA REGIONAL DE REDES DE COMPUTADORES (ERRC), 21. 2024, Rio Grande/RS. Anais [...]. Porto Alegre: Sociedade Brasileira de Computação, 2024. p. 200-203. DOI: https://doi.org/10.5753/errc.2024.4683.
+IBM. O que é IoT (internet das coisas)?. [S. l.], 2026. Disponível em: https://www.ibm.com/br-pt/think/topics/internet-of-things. Acesso em: 25 mar. 2026.
+KOLIAS, C.; KAMBOURAKIS, G.; STAVROU, A.; VOAS, J. DDoS in the IoT: Mirai and other botnets. Computer, v. 50, n. 7, p. 80-84, jul. 2017. DOI: 10.1109/MC.2017.201. Disponível em: https://ieeexplore.ieee.org/document/7971869. Acesso em: 06 mar. 2026.
+MARCELO, Antonio; PITANGA, Marcos. Honeypots: a arte de iludir hackers. Rio de Janeiro, RJ: Brasport, 2003. 98 p. ISBN 8574521485.
+MENDES, Lucas Guimarães. Construção de infraestrutura de Honeypots IoT usando computação em nuvem. 2023. 45f. Trabalho de Conclusão de Curso (Graduação em Ciência da Computação) – Universidade Federal de Uberlândia, Uberlândia, 2023.
+MICROSOFT. O que é InfoSec (segurança da informação)?. [S. l.], 2026. Disponível em: https://www.microsoft.com/pt-br/security/business/security-101/what-is-information-security-infosec. Acesso em: 14 abr. 2026.
+NUUTINEN, Niku Waltteri Saulinpoika; FAÍSCO, Miguel; PETRUSIC, Milan; MEDEIROS, Ibéria; REISER, Hans P.. Evaluating eBPF as an Alternative to Virtual Machine Introspection for High-Interaction Honeypot Implementation. In: LATIN-AMERICAN SYMPOSIUM ON DEPENDABLE COMPUTING (LADC), 14. 2025, Valparaíso/Chile. Anais [...]. Porto Alegre: Sociedade Brasileira de Computação, 2025. p. 238-254.
+OOSTERHOF, Michel. Cowrie 2.9.13 documentation. [S. l.], 2025. Disponível em: https://docs.cowrie.org/en/stable/README.html. Acesso em: 06 mar. 2026.
+OWASP. OWASP Internet of Things (IoT) Top 10. [S. l.], 2023. Disponível em: https://owasp.org/www-project-internet-of-things/. Acesso em: 06 mar. 2026.
+REIS, Cleber; LOURENÇO, Eduardo; SANTOS, Reginaldo; RIKER, André. Integrating Generative AI into Honeypots for Capturing Botnets. In: ENCONTRO NACIONAL DE INTELIGÊNCIA ARTIFICIAL E COMPUTACIONAL (ENIAC), 22. 2025, Fortaleza/CE. Anais [...]. Porto Alegre: Sociedade Brasileira de Computação, 2025. p. 688-699. ISSN 2763-9061. DOI: https://doi.org/10.5753/eniac.2025.14010.
+SAP. O que é Internet das Coisas (IoT)?. [S. l.], 2026. Disponível em: https://www.sap.com/brazil/resources/what-is-iot. Acesso em: 19 mar. 2026.
+VIEIRA, A. A. de S. Metodologia Integrativa Para a Detecção e Prevenção de Ameaças Utilizando Inteligência de Ameaça Cibernética e SIEM. 2025. 54f. Dissertação (Mestrado Profissional em Engenharia Elétrica) - Departamento de Engenharia Elétrica, Universidade de Brasília, Brasília, DF, 2025.
+WOUDENBERG, Jasper van. The hardware hacking handbook. São Francisco, CA: No Starch Press, 2022. 479 p. ISBN 9781593278748.

@@ -1,0 +1,18 @@
+[theme]
+# Define o tema base como claro
+base="light"
+
+# Cor principal (usada em botões, sliders, etc) - Azul escuro
+primaryColor="#004a8f"
+
+# Cor de fundo da aplicação - Branco
+backgroundColor="#ffffff"
+
+# Cor de fundo secundária (sidebar, painéis de métricas, etc) - Cinza muito claro
+secondaryBackgroundColor="#f8fafc"
+
+# Cor do texto principal - Cinza escuro/chumbo
+textColor="#334155"
+
+# Fonte principal da aplicação (opções: "sans serif", "serif", "monospace")
+font="sans serif"
