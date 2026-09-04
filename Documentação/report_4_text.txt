@@ -1,0 +1,163 @@
+REPORT 4
+Documento de Projeto
+IDENTIFICAÇÃO
+NO
+NOME
+e-mail
+Telefone
+223397
+Giovana Pontes Merguizo
+giovana.merguizo@outlook.com
+(11) 97533-4919
+222560
+Gustavo Figueiredo Passos
+gustavofp111@gmail.com
+(11) 94301-7516
+223497
+João Luiz Orlandini Alves
+joao.luiz.orlandini@gmail.com
+(15) 99705-3710
+TÍTULO:
+Arquitetura de Coleta e Análise de Ameaças em Tempo Real: Implementação de Honeypots Embarcados para Geração de Threat Intelligence
+LÍDER DO GRUPO:
+Giovana Pontes Merguizo
+ORIENTADOR:
+Dra. Andréia Damasio de Leles
+Data da Entrega:   18  /  05  /  2026
+____________________________
+        Visto do Orientador
+SUMÁRIO
+1 INTRODUÇÃO DO TRABALHO2
+2 TRABALHOS CORRELATOS5
+3 O QUE SERÁ FEITO7
+4 O QUE NÃO SERÁ FEITO10
+5 BENEFÍCIOS11
+6 METAS PARA O TCC 213
+7 RECURSOS UTILIZADOS14
+REFERÊNCIAS16
+INTRODUÇÃO DO TRABALHO
+A segurança da informação tem se tornado um dos principais desafios da era digital, especialmente diante do crescimento acelerado da Internet das Coisas (IoT). 
+De forma geral, a Internet das Coisas refere-se à rede de objetos e dispositivos conectados capazes de coletar e transmitir dados por meio da internet (SAP, 2026). Diante disso, essa expansão tecnológica tem proporcionado diversos benefícios operacionais e estratégicos. Entretanto, também introduz vulnerabilidades relevantes que podem ser exploradas por agentes maliciosos.
+Entre os principais benefícios da IoT destacam-se o aumento da eficiência e da produtividade empresarial, a possibilidade de tomada de decisão baseada em dados, a melhoria da experiência do usuário e a redução de custos por meio da automação de processos repetitivos. Contudo, a adoção dessa tecnologia também traz riscos relacionados à segurança e à privacidade, incluindo a vulnerabilidade a ataques de hackers e outras ameaças cibernéticas (IBM, 2026).
+Nesse contexto, muitos desses dispositivos são desenvolvidos com foco em baixo custo e rápida implementação, o que frequentemente resulta na presença de falhas de segurança, como credenciais padrão, serviços expostos e ausência de atualizações de firmware (OWASP, 2023). Como consequência, tornam-se alvos recorrentes de ataques automatizados, sendo amplamente explorados na formação de botnets.
+Uma botnet consiste em uma rede de dispositivos comprometidos frequentemente chamados de “zumbis” que, após serem infectados por um malware, passam a ser controlados remotamente de forma coordenada por um atacante. Esses conjuntos de dispositivos IoT comprometidos são frequentemente utilizados para orquestrar Ataques de Negação de Serviço Distribuída (DDoS), cujo objetivo é enviar um volume massivo de solicitações a servidores e redes alvo, sobrecarregando-os e tornando serviços essenciais indisponíveis para usuários legítimos (Kolias; Kambourakis; Stavrou; Voas, 2017).
+Diante desse cenário, observa-se que um dos principais desafios na área de segurança cibernética está relacionado à limitação de visibilidade sobre as ações dos atacantes em tempo real. Simultaneamente, esse problema é agravado pela ausência de dados estruturados, como logs e arquivos JSON (JavaScript Object Notation) padronizados, o que dificulta a identificação de padrões e tendências associados às ameaças emergentes.
+Nesse contexto, destacam-se os honeypots, que, segundo Marcelo e Pitanga (2003), são sistemas que apresentam falhas de segurança reais ou simuladas, configuradas intencionalmente com o objetivo de atrair invasores e permitir o estudo das técnicas utilizadas nas invasões. Dessa forma, constituem uma solução relevante para simular ambientes vulneráveis capazes de registrar atividades maliciosas e fornecer dados valiosos para análise (Ferreira; Nunes; Café; Júnior, 2023).
+Diante disso, o presente projeto tem como objetivo geral desenvolver uma arquitetura de coleta e análise de ameaças em tempo real por meio da implementação de um honeypot de média interação voltado para ambientes IoT. Como objetivos específicos, busca-se projetar um ambiente controlado para captura de ataques, validar a solução em hardware de baixo custo e estruturar um pipeline de análise dos dados gerados pelas invasões, permitindo o gerenciamento e a disponibilização de alertas e métricas de forma eficiente.
+A escolha deste tema justifica-se pela crescente relevância da segurança em ecossistemas IoT, considerando os impactos que ataques cibernéticos podem causar em infraestruturas críticas e serviços essenciais. Sua abrangência é significativa, pois contribui tanto para o avanço acadêmico quanto para aplicações práticas na indústria. Além disso, a geração de Threat Intelligence baseada em dados reais possibilita uma compreensão mais aprofundada das estratégias utilizadas por agentes maliciosos (Azevedo; Giozza; Mendonça; Silva Filho; Sousa Júnior; Albuquerque, 2019; Vieira, 2025).
+No que se refere à metodologia, este trabalho caracteriza-se como uma pesquisa aplicada, com abordagem exploratória e experimental. Inicialmente, foi realizada uma revisão bibliográfica baseada em autores e estudos relevantes sobre honeypots, segurança em IoT e ataques distribuídos, com o objetivo de estabelecer o embasamento teórico necessário para o desenvolvimento da proposta.
+Posteriormente, foi projetada uma arquitetura de laboratório virtualizado para implementação e validação do honeypot, utilizando o software Cowrie (Oosterhof, 2025) como base para a emulação de serviços vulneráveis. Neste ambiente, serão conduzidos testes controlados, incluindo simulações de ataques e varreduras automatizadas, com o objetivo de avaliar a capacidade do sistema em capturar e registrar eventos de forma eficiente antes de sua aplicação em ambiente físico.
+Em seguida, a solução será migrada para um ambiente de hardware físico, utilizando um microcomputador de baixo custo, como o Raspberry Pi, permitindo validar a implementação em um cenário mais próximo da realidade operacional. Para complementar a coleta de dados, essa arquitetura será integrada a um pipeline de análise, utilizando ferramentas de monitoramento e visualização de métricas, como o Grafana, para a construção de dashboards interativos. Dessa forma, será possível correlacionar eventos, identificar padrões de ataque e extrair Indicadores de Comprometimento (IoCs), transformando dados brutos em informações relevantes para a segurança.
+Com o objetivo de ampliar o escopo analítico do projeto, também será investigada a viabilidade da aplicação de técnicas avançadas de análise de dados, incluindo conceitos de inteligência artificial, a fim de explorar o potencial de previsibilidade de ataques e contribuir para o suporte à mitigação de ameaças.
+TRABALHOS CORRELATOS
+A pesquisa e o desenvolvimento na área de segurança cibernética e, mais especificamente, na implementação de honeypots para a geração de Threat Intelligence em ambientes IoT, têm sido objeto de crescente interesse.
+Nesse sentido, foi realizado um levantamento bibliográfico de abordagens recentes envolvendo segurança em IoT, honeypots e inteligência de ameaças. O Quadro 1 apresenta um quadro comparativo (benchmarking) destacando as características estruturais de trabalhos correlatos em relação à arquitetura desenvolvida no presente trabalho.
+Quadro 1 - Comparação de características entre trabalhos correlatos
+Características Analisadas
+Azevedo (2019)
+Mendes (2023)
+Costa (2025)
+O trabalho atual (2026)
+Foco Principal
+Modelo de Threat Intelligence
+Infraestrutura para Honeypots
+Honeypots para Câmera IoT
+Honeypot embarcado para Threat Intelligence
+Honeypot
+N/A
+Múltiplos
+Cowrie
+Cowrie
+Infraestrutura
+Corporativo / SIEM
+Nuvem (Cloud)
+Nuvem (Cloud)
+Hardware de borda (Raspberry Pi)
+Visualização de dados (dashboards)
+Sim
+Não detalhado
+Parcial
+Sim
+IoCs
+Teórico
+Não detalhado
+Parcial
+Sim
+Alertas Operacionais
+N/A
+Não
+Não
+Sim
+IoT
+Não
+Sim
+Sim
+Sim
+Threat Intelligence
+Sim
+Não
+Não
+Sim
+Inteligência Artificial
+Não
+Não 
+Não
+Sim
+Fonte: elaborado pelos autores, 2026.
+Conforme observado no Quadro 1, embora a literatura apresente estudos robustos sobre Threat Intelligence (Azevedo; Giozza; Mendonça; Silva Filho; Sousa Júnior; Albuquerque, 2019) e a utilização do Cowrie para proteção de dispositivos específicos (Costa, 2025), nota-se uma predominância de implantações baseadas em infraestrutura de nuvem ou frotas corporativas. O presente trabalho preenche uma lacuna prática ao trazer a validação estrutural do honeypot diretamente para um hardware de borda de baixo custo (Raspberry Pi), integrando a captura automatizada do Cowrie com um pipeline avançado de observabilidade no Grafana, permitindo a extração visual e contínua de Indicadores de Comprometimento (IoCs).
+O QUE SERÁ FEITO
+Para a apresentação do TCC 1, conforme ilustrado na Figura 1, será demonstrada uma Prova de Conceito (PoC) em um ambiente de laboratório virtualizado e orquestrado em contêineres, focada na detecção e análise de ataques contra ambientes IoT. 
+Figura 1 - Diagrama TCC 1
+Fonte: elaborada pelos autores, 2026.
+Seguindo o fluxo da arquitetura proposta, o processo inicia-se na camada de coleta, onde ocorre a simulação da telemetria de um honeypot de média interação (Cowrie) por meio da injeção de um dataset com logs reais de invasão. Em seguida, o protótipo contempla a estruturação de um pipeline de observabilidade com o uso do Promtail, cuja função é coletar os registros e enviar para o agregador Loki, que é continuamente monitorado pelo Grafana. A partir da identificação de padrões de ataque, o Grafana atua como um motor de eventos, sendo responsável por disparar alertas via Webhook para uma API (Application Programming Interface) centralizada, desenvolvida para o escopo do projeto.
+Como principal diferencial tecnológico desta etapa, a API desenvolvida encaminha os dados do ataque para o Ollama, que atua como um Large Language Model (LLM) executado localmente para a extração de inteligência e análise cognitiva das táticas de ataque. Nesta etapa da PoC, a arquitetura ainda não utiliza técnicas de Retrieval-Augmented Generation (RAG), sendo visadas para a entrega da solução final.
+Por fim, com o uso da API, serão enviados alertas ao Telegram, enquanto consolida e exibe os incidentes analisados em um front-end,  validando assim a arquitetura lógica e funcional da solução proposta antes da sua implementação física em hardware dedicado.
+Para a apresentação final (TCC 2), o projeto avançará da fase de simulação para a implantação física, embarcando o honeypot (Cowrie) em hardware de edge computing (Raspberry Pi), a fim de validar a eficácia da solução em um cenário prático de Indústria 4.0. Para garantir a aplicabilidade real da arquitetura, a aquisição e a coleta dos dados não ocorrerão em processamento em lote (batch), mas sim em fluxo contínuo e em tempo quase real (near real-time), utilizando uma arquitetura orientada a eventos (event-driven).
+Dessa maneira, visto que as interfaces de observabilidade e o disparo de alertas já foram consolidados no escopo inicial, a evolução arquitetural do pipeline será focada na integração de um Banco de Dados Vetorial (Vector DB) à API central. Essa modernização estrutural viabiliza a construção de um assistente de segurança baseado em arquitetura RAG (Retrieval-Augmented Generation).
+A aplicação desta técnica de análise avançada dotará o motor cognitivo de memória de longo prazo. Com a ingestão contínua dos eventos e sua imediata vetorização, será viabilizada não apenas a extração estruturada de Indicadores de Comprometimento (IoCs) na borda, mas também a interação conversacional com o histórico de incidentes para identificar padrões de comportamento malicioso, elevando o nível de resposta a ameaças.
+Para uma melhor compreensão, a arquitetura final pretendida, contemplando os fluxos bidirecionais de dados e a ingestão contínua, pode ser observada na Figura 2.
+Figura 2 - Diagrama TCC 2
+Fonte: elaborada pelos autores, 2026.
+O QUE NÃO SERÁ FEITO
+Este projeto tem como foco o desenvolvimento de uma arquitetura de coleta e análise de ameaças em ambientes IoT por meio da implementação de um honeypot de média interação em um ambiente controlado de laboratório. Dessa forma, o escopo do trabalho está limitado à captura, registro e análise inicial de eventos de segurança gerados por tentativas de invasão em serviços simulados.
+Não faz parte do escopo deste trabalho o desenvolvimento de mecanismos completos de defesa ou mitigação automática de ataques em redes reais de produção, bem como a implantação da solução em infraestruturas corporativas ou críticas. Além disso, o projeto não contempla a criação de novos algoritmos de detecção proprietários, concentrando-se na coleta estruturada de dados e na análise das atividades maliciosas observadas.
+Também não serão abordadas integrações com sistemas comerciais de segurança da informação, como plataformas completas de SIEM (Security Information and Event Management) ou soluções corporativas de gestão de incidentes. O estudo concentra-se na construção de um ambiente experimental capaz de gerar dados relevantes sobre ataques direcionados a dispositivos IoT, contribuindo para fins acadêmicos, experimentais e para o aprimoramento da compreensão sobre o comportamento de ameaças nesse tipo de ecossistema.
+BENEFÍCIOS  
+Observa-se que o crescimento acelerado da Internet das Coisas (IoT) tem ampliado significativamente a quantidade de dispositivos conectados à internet, proporcionando diversos benefícios em termos de automação, monitoramento e tomada de decisão baseada em dados. Entretanto, essa expansão também amplia a superfície de ataque, tornando esses dispositivos alvos frequentes de ameaças cibernéticas, muitas vezes devido à presença de falhas de segurança, configurações inadequadas ou ausência de mecanismos robustos de proteção (IBM, 2026).
+Diante desse cenário, torna-se cada vez mais relevante o desenvolvimento de soluções capazes de identificar, registrar e analisar atividades maliciosas direcionadas a esses dispositivos. Nesse sentido, o presente projeto busca contribuir para o campo da segurança cibernética por meio da implementação de uma arquitetura baseada em honeypots, capaz de simular ambientes vulneráveis e capturar tentativas reais de ataque, possibilitando o estudo do comportamento de agentes maliciosos e das técnicas utilizadas nas invasões.
+Como principal benefício, a solução proposta permite a coleta estruturada de dados sobre ataques direcionados a ambientes IoT, contribuindo para a geração de conhecimento e para o aprimoramento de estratégias de defesa. Além disso, ao utilizar hardware de baixo custo e ferramentas amplamente disponíveis na comunidade de segurança da informação, o projeto demonstra a viabilidade de implementação de ambientes de monitoramento de ameaças acessíveis tanto para fins acadêmicos quanto experimentais.
+Outro ponto relevante está na estruturação de um pipeline de análise de dados que possibilite a organização, visualização e interpretação das informações coletadas durante as tentativas de invasão. A utilização de ferramentas de monitoramento e visualização de métricas (Grafana) permite identificar padrões de ataque, correlacionar eventos e extrair Indicadores de Comprometimento (IoCs), transformando dados brutos em informações relevantes para a análise de segurança.
+Dessa forma, este projeto apresenta como contribuição principal a construção de um ambiente experimental, conforme detalhado na seção de Recursos Utilizados (e ilustrado pelas Figuras 1 e 2), voltado à captura e análise de ameaças em dispositivos IoT. A implementação fornece subsídios relevantes para estudos sobre o comportamento de ataques e amplia a compreensão sobre os riscos inerentes a esse ecossistema tecnológico. Além disso, os resultados obtidos podem servir de base para futuras pesquisas e para o desenvolvimento de mecanismos mais avançados de detecção e mitigação de ameaças em ambientes conectados.
+METAS PARA O TCC 2
+As metas previstas para o TCC 2, considerando o desenvolvimento da arquitetura de honeypot voltada para ambientes IoT, contemplam as seguintes etapas:
+Implementar o honeypot em hardware físico de baixo custo (Raspberry Pi), validando seu funcionamento em um cenário operacional real;
+Realizar testes controlados e exposição monitorada à internet para captura de incidentes e tentativas de invasão em tempo real;
+Implementar e estruturar o pipeline de observabilidade, abrangendo a coleta, armazenamento e processamento dos dados;
+Configurar dashboards de monitoramento e visualização de métricas para análise dos eventos capturados;
+Identificar padrões de ataque e extrair Indicadores de Comprometimento (IoCs) a partir dos dados coletados;
+Avaliar o desempenho, estabilidade e efetividade da arquitetura proposta com base nos objetivos definidos;
+Avaliar as métricas e resultados extraídos de acordo com o embasamento teórico;
+Explorar a viabilidade técnica da aplicação de Inteligência Artificial e análise cognitiva para suporte à identificação de comportamentos maliciosos;
+Consolidar os resultados, discussões e conclusões na versão final da monografia;
+Estruturar a apresentação final para a banca examinadora.
+RECURSOS UTILIZADOS
+Para o desenvolvimento do projeto, será utilizado um ambiente experimental voltado à segurança da informação, estruturado sobre sistemas operacionais baseados em Linux, escolhidos devido à sua flexibilidade, estabilidade e suporte a ferramentas de monitoramento. A base desse ecossistema será um honeypot de média interação, implementado por meio do software Cowrie (Oosterhof, 2025), o qual é capaz de emular interfaces de acesso remoto (como os protocolos SSH e Telnet) e registrar atividades maliciosas de atacantes. 
+Para alinhar o ambiente experimental à realidade operacional da Indústria 4.0, a arquitetura simula a camada de conectividade de um sistema Industrial Internet of Things (IIoT). Especificamente, um microcomputador atuará emulando um Gateway de Borda (Edge Gateway). Em cenários reais de manufatura avançada (como no monitoramento de temperatura e vibração de motores para manutenção preditiva, ou no controle de esteiras automatizadas), esses gateways atuam como ponte entre a rede de Tecnologia de Operação (TA), onde residem os sensores e atuadores, e a rede de Tecnologia da Informação (TI).
+Nesse contexto, conforme destacado por Sisinni, Saifullah, Han, Jennehag e Gidlund (2018) , a convergência entre essas redes expandiu significativamente a superfície de ataque cibernético, expondo dispositivos de borda antes isolados. Dessa forma, a emulação de um nó de conectividade justifica-se pela necessidade crítica de extrair inteligência de ameaças voltada à proteção de infraestruturas cibernético-físicas.
+A arquitetura do projeto será executada em duas etapas de implantação. A fase inicial será desenvolvida em um ambiente de laboratório virtualizado, permitindo a realização de testes controlados. Posteriormente, a solução será migrada para um ambiente físico utilizando um microcomputador de baixo custo, como o Raspberry Pi. Essa escolha deve-se ao seu baixo consumo de energia, custo acessível e capacidade de executar distribuições Linux, demonstrando a viabilidade de implementação de soluções de monitoramento em dispositivos com recursos computacionais limitados, característica comum aos ecossistemas de Internet das Coisas.
+Em relação à geração de dados, o projeto também adota uma abordagem em duas fases. Na etapa de validação da Prova de Conceito em ambiente virtualizado, os dados são injetados de forma controlada a partir de um dataset composto por logs de ataques reais, garantindo a calibração do pipeline de ingestão e do motor cognitivo de Inteligência Artificial. Na fase de implantação física, a geração de dados ocorrerá de forma orgânica e em tempo real, capturando as interações e varreduras de atacantes e botnets reais contra o hardware exposto.
+No que se refere ao armazenamento e estruturação dos dados coletados durante as tentativas de invasão, serão utilizados arquivos de log e registros estruturados em formato JSON, facilitando a organização e o processamento das informações geradas pelo honeypot. Esses dados incluirão registros de conexão, comandos executados pelos atacantes, tentativas de autenticação e outras atividades observadas durante os ataques.
+Por fim, para a análise e visualização das informações coletadas, será utilizada a ferramenta de monitoramento Grafana, que possibilita a criação de dashboards interativos e a visualização de métricas em tempo real. Por meio dela, será possível apresentar estatísticas relacionadas às tentativas de invasão, identificar padrões de ataque e correlacionar eventos registrados pelo sistema.
+REFERÊNCIAS
+AZEVEDO, B. W. P.; GIOZZA, W. F.; MENDONÇA, F. L. L. de; SILVA FILHO, D. A. da; SOUSA JÚNIOR, R. T. de; ALBUQUERQUE, R. de O. Proposta de modelo de referência de inteligência de ameaças. In: CONFERÊNCIAS IADIS IBERO-AMERICANAS WWW/INTERNET E COMPUTAÇÃO APLICADA, 17., 2019, Lisboa. Atas [...]. Lisboa: IADIS, 2019. Disponível em: https://www.researchgate.net/profile/Robson-Albuquerque/publication/338483533_PROPOSTA_DE_MODELO_DE_REFERENCIA_DE_INTELIGENCIA_DE_AMEACAS/links/5e171d36299bf10bc39e21d0/PROPOSTA-. Acesso em: 13 mar. 2026.
+COSTA, Huryel Souto. Construção de Honeypot para câmeras IoT usando computação em nuvem. 2025. 47 f. Trabalho de Conclusão de Curso (Graduação em Ciência da Computação) – Universidade Federal de Uberlândia, Uberlândia, 2025.
+FERREIRA, L. V. A.; NUNES, R. R.; CAFÉ, D. C.; JÚNIOR, R. T. de S. Uso de honeypots na detecção de rootkits de malware: proposta de uma agenda de pesquisa. Revista Ibérica de Sistemas e Tecnologias de Informação, n. E60, p. 179-192, 2023.
+IBM. O que é IoT (internet das coisas)?. [S. l.], 2026. Disponível em: https://www.ibm.com/br-pt/think/topics/internet-of-things. Acesso em: 25 mar. 2026.
+KOLIAS, C.; KAMBOURAKIS, G.; STAVROU, A.; VOAS, J. DDoS in the IoT: Mirai and other botnets. Computer, v. 50, n. 7, p. 80-84, jul. 2017. DOI: 10.1109/MC.2017.201. Disponível em: https://ieeexplore.ieee.org/document/7971869. Acesso em: 06 mar. 2026.
+MARCELO, Antonio; PITANGA, Marcos. Honeypots: a arte de iludir hackers. Rio de Janeiro, RJ: Brasport, 2003. 98 p. ISBN 8574521485.
+MENDES, Lucas Guimarães. Construção de infraestrutura de Honeypots IoT usando computação em nuvem. 2023. 45 f. Trabalho de Conclusão de Curso (Graduação em Ciência da Computação) – Universidade Federal de Uberlândia, Uberlândia, 2023.
+OOSTERHOF, Michel. Cowrie 2.9.13 documentation. [S. l.], 2025. Disponível em: https://docs.cowrie.org/en/stable/README.html. Acesso em: 06 mar. 2026.
+OWASP. OWASP Internet of Things (IoT) Top 10. [S. l.], 2023. Disponível em: https://owasp.org/www-project-internet-of-things/. Acesso em: 06 mar. 2026.
+SAP. O que é Internet das Coisas (IoT)?. [S. l.], 2026. Disponível em: https://www.sap.com/brazil/resources/what-is-iot. Acesso em: 19 mar. 2026.
+SISINNI, E.; SAIFULLAH, A.; HAN, S.; JENNEHAG, U.; GIDLUND, M. Industrial internet of things: Challenges, opportunities, and directions. IEEE Transactions on Industrial Informatics, v. 14, n. 11, p. 4724-4734, 2018. DOI: 10.1109/TII.2018.2852491. Disponível em: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8401919&isnumber=8523838. Acesso em: 14 mai. 2026.
+VIEIRA, A. A. de S. Metodologia Integrativa Para a Detecção e Prevenção de Ameaças Utilizando Inteligência de Ameaça Cibernética e SIEM. 2025. 54 f. Dissertação (Mestrado Profissional em Engenharia Elétrica) - Departamento de Engenharia Elétrica, Universidade de Brasília, Brasília, DF, 2025.
