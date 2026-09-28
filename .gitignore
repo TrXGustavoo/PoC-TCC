@@ -22,4 +22,8 @@ alerts-api/__pycache__/
 .DS_Store
 
 # grafana_data/
+grafana_data/plugins/
+grafana_data/csv/
+grafana_data/png/
+grafana_data/pdf/
 cowrie/var/log/cowrie/cowrie.json
