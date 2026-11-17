@@ -1,0 +1,46 @@
+flowchart LR
+    %% ========================================================
+    %% DIAGRAMA ARQUITETURAL: AMBIENTE VIRTUALIZADO (PROVA DE CONCEITO)
+    %% Projeto TCC - Fase 1: Laboratório com Dataset Kaggle
+    %% ========================================================
+
+    subgraph TELEMETRIA["1. Simulação da Telemetria"]
+        KAGGLE[("📊 Dataset de Invasão<br/><i>kaggle_logs.json<br/>(Sessões SSH & Força Bruta)</i>")]
+    end
+
+    subgraph OBS["2. Pipeline de Observabilidade"]
+        PROMTAIL["📦 Promtail<br/><i>Agente Local de Ingestão</i>"]
+        LOKI["🔥 Grafana Loki (:3100)<br/><i>Agregador & Labels Temporal</i>"]
+        GRAFANA["📊 Grafana (:3000)<br/><i>Dashboards & Alertas LogQL</i>"]
+    end
+
+    subgraph BACKEND["3. Processamento & IA Generativa"]
+        API["⚡ FastAPI Orchestrator (:5000)<br/><i>alerts-api (Normalização)</i>"]
+        OLLAMA["🦙 Ollama Local (:11434)<br/><i>Modelo: Llama 3.2 (Zero-shot)</i>"]
+    end
+
+    subgraph INTERFACES["4. Interfaces de Consumo"]
+        TELEGRAM["✈️ Telegram Bot<br/><i>Notificações Mobile</i>"]
+        STREAMLIT["🖥️ Streamlit (:8501)<br/><i>Feed Tático & Relatórios IA</i>"]
+    end
+
+    %% Conexões
+    KAGGLE -->|"Leitura de Arquivo"| PROMTAIL
+    PROMTAIL -->|"HTTP Push"| LOKI
+    LOKI -->|"Consulta LogQL"| GRAFANA
+    GRAFANA -->|"Webhook POST (/webhook)"| API
+    API <-->|"Prompt / Resposta MITRE"| OLLAMA
+    API -->|"Alertas Críticos"| TELEGRAM
+    API -->|"Endpoint /alerts"| STREAMLIT
+    GRAFANA -.->|"Iframe Embutido"| STREAMLIT
+
+    %% Estilização
+    classDef dataClass fill:#f1f5f9,stroke:#64748b,stroke-width:2px,color:#0f172a;
+    classDef obsClass fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#9a3412;
+    classDef coreClass fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e3a8a;
+    classDef uiClass fill:#faf5ff,stroke:#7c3aed,stroke-width:2px,color:#4c1d95;
+
+    class KAGGLE dataClass;
+    class PROMTAIL,LOKI,GRAFANA obsClass;
+    class API,OLLAMA coreClass;
+    class TELEGRAM,STREAMLIT uiClass;

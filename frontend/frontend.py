@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 import pandas as pd
 import streamlit as st
@@ -103,8 +104,9 @@ st.markdown("<h1 class='main-title'>🛡️ SOC AUTÔNOMO - THREAT INTELLIGENCE<
 st.markdown("<div class='sub-title'>Monitoramento em Tempo Real & Investigação Forense com IA Generativa (Cowrie Honeypot Edge)</div>", unsafe_allow_html=True)
 
 # ==========================================
-# FUNÇÕES DE COMUNICAÇÃO COM A API
+# FUNÇÕES DE COMUNICAÇÃO COM A API (COM CACHE)
 # ==========================================
+@st.cache_data(ttl=4, show_spinner=False)
 def fetch_alerts():
     try:
         response = requests.get(ALERTS_ENDPOINT, timeout=4)
@@ -117,7 +119,7 @@ def fetch_alerts():
 def query_chat_rag(question: str):
     try:
         payload = {"pergunta": question}
-        response = requests.post(CHAT_ENDPOINT, json=payload, timeout=90)
+        response = requests.post(CHAT_ENDPOINT, json=payload, timeout=40)
         if response.status_code == 200:
             return response.json().get("resposta", "Resposta vazia retornada pela IA.")
         return f"❌ Erro na API ({response.status_code}): {response.text}"
@@ -126,6 +128,7 @@ def query_chat_rag(question: str):
     except Exception as e:
         return f"❌ Falha de conexão com o endpoint RAG: {e}"
 
+@st.cache_data(ttl=10, show_spinner=False)
 def fetch_iocs():
     try:
         response = requests.get(IOCS_ENDPOINT, timeout=6)
@@ -135,6 +138,7 @@ def fetch_iocs():
     except Exception:
         return None
 
+@st.cache_data(ttl=20, show_spinner=False)
 def fetch_firewall_rules(formato: str = "ufw"):
     try:
         response = requests.get(f"{EXPORT_ENDPOINT}?format={formato}", timeout=6)
@@ -149,7 +153,7 @@ def fetch_firewall_rules(formato: str = "ufw"):
 # ==========================================
 tab_alerts, tab_iocs, tab_malware, tab_chat, tab_grafana = st.tabs([
     "🚨 Feed Tático de Incidentes",
-    "🛡️ Inteligência de IoCs & Resposta Ativa",
+    "🛡️ Inteligência de IoCs (Threat Intel)",
     "🦠 Análise de Malwares & Hashes (Threat Intel)",
     "🤖 Assistente Investigativo (RAG SOC)",
     "📊 Observabilidade em Tempo Real (Grafana)"
@@ -161,31 +165,78 @@ tab_alerts, tab_iocs, tab_malware, tab_chat, tab_grafana = st.tabs([
 with tab_alerts:
     data = fetch_alerts()
 
-    # Métricas superiores
-    col_m1, col_m2, col_m3, col_m4, col_m5 = st.columns([1.5, 1.5, 1.5, 1.5, 1])
+    # ==============================================================================
+    # CONTROLE DE FILTRO: ATAQUES REAIS (EXTERNOS) VS. AMBIENTE LOCAL (TESTES & VPN)
+    # ==============================================================================
+    col_filtro_modo, col_filtro_detalhe, col_btn_refresh = st.columns([2.5, 1.8, 1])
+    
+    with col_filtro_modo:
+        mostrar_local = False
+        # Controle mantido no código, porém oculto visualmente no Frontend:
+        # mostrar_local = st.toggle(
+        #     "🏠 Exibir Incidentes do Ambiente Local (Testes & VPN)",
+        #     value=False,
+        #     help="• DESATIVADO (Padrão): Exibe exclusivamente os ataques reais com IPs públicos externos.\n• ATIVADO: Exibe os incidentes gerados durante os testes no ambiente local e Raspberry Pi."
+        # )
+
+    with col_filtro_detalhe:
+        if mostrar_local:
+            tipo_local = st.checkbox("Incluir também ataques reais (Ver Todos)", value=False, help="Marque para visualizar a telemetria unificada de ataques reais + testes locais.")
+        else:
+            tipo_local = False
+            st.caption("🛡️ Exibindo apenas **Ataques Reais** (IPs públicos internacionais)")
+
+    with col_btn_refresh:
+        st.write("")
+        if st.button("🔄 Atualizar Feed", use_container_width=True):
+            fetch_alerts.clear()
+            fetch_iocs.clear()
+            st.rerun()
+
+    def is_local_incident(item):
+        r = item.get("raw_data", {})
+        g = r.get("geo", {})
+        p = g.get("pais", "")
+        origem_ip = str(r.get("ip_origem", ""))
+        if p in ("Ambiente Local", "Rede Privada / Tailscale"):
+            return True
+        if origem_ip in ("127.0.0.1", "localhost", "N/A", "Desconhecido", ""):
+            return True
+        if origem_ip.startswith("100.") or origem_ip.startswith("172.") or origem_ip.startswith("192.168.") or origem_ip.startswith("10."):
+            return True
+        return False
 
     alertas = []
     if data is not None:
-        alertas = data.get("alerts", [])
-        total_alertas = data.get("total", len(alertas))
+        todos_alertas = data.get("alerts", [])
+        if not mostrar_local:
+            # Desativado: apenas ataques reais externos
+            alertas = [a for a in todos_alertas if not is_local_incident(a)]
+            subtitulo_total = "Ataques Reais Externos"
+        else:
+            if tipo_local:
+                alertas = todos_alertas
+                subtitulo_total = "Todos os Incidentes (Reais + Locais)"
+            else:
+                alertas = [a for a in todos_alertas if is_local_incident(a)]
+                subtitulo_total = "Simulações / Ambiente Local"
+
+        total_alertas = len(alertas)
         ips_unicos = len(set(a.get("raw_data", {}).get("ip_origem") for a in alertas if a.get("raw_data", {}).get("ip_origem") not in ["Desconhecido", "N/A"]))
         paises_unicos = len(set(a.get("raw_data", {}).get("geo", {}).get("pais") for a in alertas if a.get("raw_data", {}).get("geo", {}).get("pais") not in [None, "Desconhecido", "N/A"]))
 
+        col_m1, col_m2, col_m3, col_m4 = st.columns(4)
         col_m1.metric("Status da API", "Online 🟢", "Porta 5000")
-        col_m2.metric("Total de Alertas", total_alertas, "Incidentes Capturados")
+        col_m2.metric("Total de Alertas", total_alertas, subtitulo_total)
         col_m3.metric("IPs Atacantes", ips_unicos, "Únicos")
         col_m4.metric("Países de Origem", paises_unicos, "Threat Intel")
     else:
         total_alertas = 0
+        col_m1, col_m2, col_m3, col_m4 = st.columns(4)
         col_m1.metric("Status da API", "Offline 🔴", "Inacessível")
         col_m2.metric("Total de Alertas", "-", "-")
         col_m3.metric("IPs Atacantes", "-", "-")
         col_m4.metric("Países de Origem", "-", "-")
-
-    with col_m5:
-        st.write("")
-        if st.button("🔄 Atualizar Feed", use_container_width=True):
-            st.rerun()
 
     st.divider()
 
@@ -247,13 +298,16 @@ with tab_alerts:
 
         st.divider()
 
-        # Filtro rápido
-        col_search, col_stats = st.columns([3, 1])
+        # Filtro rápido e Controle de Paginação
+        col_search, col_limit, col_stats = st.columns([2.5, 1.2, 0.8])
         with col_search:
             termo_busca = st.text_input("🔍 Filtrar alertas por IP, país, evento ou comando:", placeholder="Ex: Germany, cowrie.command.input, 192.168, /etc/shadow...")
+        with col_limit:
+            opcoes_qtd = [25, 50, 100, "Todos"]
+            qtd_selecionada = st.selectbox("Exibir no Feed:", opcoes_qtd, index=0, help="Limitar a quantidade de cards renderizados acelera a navegação e evita travamentos.")
         with col_stats:
             st.write("")
-            st.caption(f"Mostrando {len(alertas)} eventos recentes")
+            st.caption(f"{len(alertas)} eventos totais")
 
         alertas_filtrados = []
         for a in alertas:
@@ -262,7 +316,13 @@ with tab_alerts:
             if not termo_busca or termo_busca.lower() in raw_str or termo_busca.lower() in ai_str:
                 alertas_filtrados.append(a)
 
-        for i, alerta in enumerate(alertas_filtrados):
+        limite_num = len(alertas_filtrados) if qtd_selecionada == "Todos" else int(qtd_selecionada)
+        alertas_exibidos = alertas_filtrados[:limite_num]
+
+        if len(alertas_filtrados) > limite_num:
+            st.caption(f"Mostrando os **{limite_num}** incidentes mais recentes (de **{len(alertas_filtrados)}** filtrados).")
+
+        for i, alerta in enumerate(alertas_exibidos):
             raw = alerta.get("raw_data", {})
             evento = raw.get("evento", "N/A")
             ip_origem = raw.get("ip_origem", "Desconhecido")
@@ -276,13 +336,23 @@ with tab_alerts:
             isp = geo.get("isp", "N/A")
             localizacao_str = f"{cidade}, {pais}" if cidade else pais
 
-            # Identificação de Severidade Visual
-            if "command" in evento:
-                badge = "⚡ COMANDO EXECUTADO"
+            # Identificação de Severidade Visual (MITRE ATT&CK)
+            if "T1105" in evento or "download" in evento:
+                badge = "📥 DOWNLOAD DE PAYLOAD / MALWARE (T1105)"
+            elif "T1003" in evento:
+                badge = "🔒 ESCALONAMENTO / CREDENCIAIS (T1003)"
+            elif "T1098" in evento:
+                badge = "📌 TENTATIVA DE PERSISTÊNCIA (T1098)"
+            elif "T1070" in evento:
+                badge = "🧹 EVASÃO / ANTI-FORENSE (T1070)"
+            elif "T1572" in evento or "direct-tcpip" in evento:
+                badge = "🚇 TÚNEL SSH / PIVOTING (T1572)"
+            elif "T1595" in evento or "connect" in evento:
+                badge = "🔍 RECONHECIMENTO / FLOOD SSH (T1595)"
+            elif "command" in evento:
+                badge = "⚡ COMANDO EXECUTADO (T1059)"
             elif "success" in evento:
-                badge = "🚨 INVASÃO / LOGIN BEM-SUCEDIDO"
-            elif "download" in evento:
-                badge = "📥 DOWNLOAD DE PAYLOAD / MALWARE"
+                badge = "🚨 INVASÃO / LOGIN BEM-SUCEDIDO (T1078)"
             else:
                 badge = "⚠️ ATIVIDADE SUSPEITA"
 
@@ -300,23 +370,29 @@ with tab_alerts:
                     st.markdown(f"**🌍 Local:** {bandeira} {localizacao_str}")
                     st.markdown(f"**🏢 Provedor (ISP):** `{isp}`")
                     st.markdown(f"**📍 Coordenadas:** `{geo.get('lat', 0.0)}, {geo.get('lon', 0.0)}`")
-                    st.divider()
-                    st.json({
+                    st.markdown(f"**🆔 Sessão:** `{sessao}`")
+                    dados_brutos_json = json.dumps({
                         "timestamp": timestamp,
                         "src_ip": ip_origem,
                         "eventid": evento,
                         "session": sessao,
                         "geo": geo
-                    })
+                    }, indent=2, ensure_ascii=False)
+                    st.markdown(f"""
+                    <details style='margin-top: 10px; background-color: #1e222d; padding: 8px 12px; border-radius: 6px; border: 1px solid #2d3139;'>
+                        <summary style='cursor: pointer; font-weight: bold; color: #00FFAA; font-size: 13px;'>📄 Ver JSON Bruto</summary>
+                        <pre style='margin-top: 8px; font-size: 11px; color: #e6edf3; background: #0d1117; padding: 10px; border-radius: 4px; overflow-x: auto; max-height: 220px;'><code>{dados_brutos_json}</code></pre>
+                    </details>
+                    """, unsafe_allow_html=True)
 
 # ==============================================================================
-# ABA 2: INTELIGÊNCIA DE IOCS & RESPOSTA ATIVA (DEFESA AUTOMATIZADA)
+# ABA 2: INTELIGÊNCIA DE IOCS (THREAT INTELLIGENCE)
 # ==============================================================================
 with tab_iocs:
     st.markdown("### 🛡️ Inteligência de Ameaças & Indicadores de Comprometimento (IoCs)")
     st.markdown(
-        "Extração, correlação e conversão automática de telemetria ofensiva em "
-        "**regras de defesa perimetral (Active Defense)** para proteção de infraestrutura."
+        "Extração, correlação e categorização de telemetria ofensiva capturada no honeypot "
+        "(endereços IP maliciosos, dicionário de credenciais de força bruta e comandos executados)."
     )
 
     iocs_data = fetch_iocs()
@@ -350,6 +426,7 @@ with tab_iocs:
     with col_i6:
         st.write("")
         if st.button("🔄 Atualizar IoCs", key="btn_refresh_iocs", use_container_width=True):
+            fetch_iocs.clear()
             st.rerun()
 
     st.divider()
@@ -369,14 +446,21 @@ with tab_iocs:
         if not ips_list:
             st.info("Nenhum IP malicioso registrado até o momento.")
         else:
-            col_f1, col_f2 = st.columns([3, 1])
+            col_f1, col_f2, col_f3 = st.columns([2.5, 1, 1.3])
             with col_f1:
                 filtro_ip = st.text_input("Filtrar por IP, País ou Provedor (ISP):", placeholder="Ex: Netherlands, 100., Hetzner...", key="filter_iocs_ip")
             with col_f2:
                 filtro_sev = st.selectbox("Severidade:", ["Todas", "CRÍTICO", "ALTO", "MÉDIO"], key="filter_iocs_sev")
+            with col_f3:
+                st.write("")
+                mostrar_local_iocs = st.checkbox("Exibir IPs Locais / VPN", value=False, key="filter_iocs_local", help="Desative para ver apenas IPs atacantes públicos externos.")
 
             ips_filtrados = []
             for item in ips_list:
+                is_local_ip = item.get("pais") in ("Ambiente Local", "Rede Privada / Tailscale") or str(item.get("ip", "")).startswith(("100.", "172.", "192.168.", "10.", "127.", "N/A"))
+                if not mostrar_local_iocs and is_local_ip:
+                    continue
+
                 str_repr = f"{item.get('ip')} {item.get('pais')} {item.get('isp')}".lower()
                 match_text = not filtro_ip or filtro_ip.lower() in str_repr
                 match_sev = filtro_sev == "Todas" or item.get("severidade") == filtro_sev
@@ -438,84 +522,6 @@ with tab_iocs:
                     })
                 st.dataframe(pd.DataFrame(cmds_df_data), use_container_width=True, hide_index=True)
 
-        st.divider()
-
-        # ----------------------------------------------------
-        # SEÇÃO 3: CENTRAL DE RESPOSTA ATIVA (EXPORTADOR DE FIREWALL)
-        # ----------------------------------------------------
-        st.markdown("#### 🚀 3. Central de Resposta Ativa: Exportador de Firewall & IoCs")
-        st.markdown(
-            "Exporte scripts automatizados para bloqueio perimetral imediato "
-            "dos invasores no gateway, firewall corporativo, EDR/SIEM ou no próprio Raspberry Pi."
-        )
-
-        col_cfg, col_code = st.columns([1, 2])
-
-        with col_cfg:
-            opcoes_formato = [
-                ("ufw", "UFW (Debian / Ubuntu / Raspberry Pi)"),
-                ("iptables", "iptables (Linux / Roteadores)"),
-                ("hashes", "Lista de Hashes SHA-256 (EDR / Antivírus / SIEM)"),
-                ("raw", "Lista Bruta de IPs (pfSense / Pi-hole)"),
-                ("json", "JSON Estruturado (STIX / SIEM)")
-            ]
-            formato_selecionado = st.radio(
-                "Selecione o Formato do Firewall / IoCs:",
-                [opt[0] for opt in opcoes_formato],
-                format_func=lambda x: dict(opcoes_formato).get(x, x),
-                key="radio_firewall_format"
-            )
-
-            extensao = {
-                "ufw": ("firewall_rules.sh", "text/x-sh"),
-                "iptables": ("iptables_rules.sh", "text/x-sh"),
-                "hashes": ("malware_hashes.txt", "text/plain"),
-                "raw": ("blocklist.txt", "text/plain"),
-                "json": ("iocs_threat_intel.json", "application/json")
-            }
-            nome_arquivo, mime_type = extensao.get(formato_selecionado, ("rules.txt", "text/plain"))
-
-            conteudo_script = fetch_firewall_rules(formato_selecionado) or "# Erro ao gerar regras"
-
-            st.download_button(
-                label=f"📥 Baixar Arquivo ({nome_arquivo})",
-                data=conteudo_script,
-                file_name=nome_arquivo,
-                mime=mime_type,
-                use_container_width=True,
-                type="primary",
-                key="btn_download_firewall"
-            )
-
-            if formato_selecionado in ("ufw", "iptables"):
-                st.markdown("""
-                **Como aplicar no Raspberry Pi (Edge):**
-                ```bash
-                scp -P 50022 firewall_rules.sh pi@100.127.31.12:/tmp/
-                ssh -p 50022 pi@100.127.31.12 "sudo bash /tmp/firewall_rules.sh"
-                ```
-                """)
-            elif formato_selecionado == "hashes":
-                st.markdown("""
-                **Aplicação de Hashes SHA-256:**
-                * Importe em EDRs (CrowdStrike, Defender for Endpoint)
-                * Use em regras de detecção YARA ou SIEM (Splunk, Elastic)
-                """)
-            else:
-                st.markdown("""
-                **Aplicação de Listas / JSON:**
-                * Importe o arquivo em firewalls de borda ou feeds STIX/TAXII.
-                """)
-
-        with col_code:
-            st.caption(f"Pré-visualização do script gerado ({formato_selecionado}):")
-            lang = "bash" if formato_selecionado in ("ufw", "iptables") else ("json" if formato_selecionado == "json" else "text")
-            st.code(
-                conteudo_script,
-                language=lang,
-                line_numbers=True
-            )
-
 # ==============================================================================
 # ABA 3: ANÁLISE DE MALWARES, HASHES SHA-256 E THREAT INTEL
 # ==============================================================================
@@ -553,6 +559,7 @@ with tab_malware:
     with col_mw5:
         st.write("")
         if st.button("🔄 Atualizar Malwares", key="btn_refresh_malware_tab", use_container_width=True):
+            fetch_iocs.clear()
             st.rerun()
 
     st.divider()
@@ -632,40 +639,6 @@ with tab_malware:
 
                     st.write("")
                     st.caption("🔍 *Dica Forense:* O VirusTotal permite verificar se o hash já foi associado a campanhas de APTs conhecidas.")
-
-        st.divider()
-
-        # ----------------------------------------------------
-        # SEÇÃO 3: EXPORTAÇÃO DIRETA DE HASHES PARA EDR / SIEM
-        # ----------------------------------------------------
-        st.markdown("#### 📦 3. Exportador de Hashes SHA-256 para Defesa de Endpoint (EDR)")
-        st.markdown(
-            "Exporte a lista de hashes SHA-256 dos artefatos capturados para criar regras de bloqueio "
-            "em soluções de EDR (CrowdStrike Falcon, Microsoft Defender for Endpoint), regras YARA ou feeds de SIEM."
-        )
-
-        conteudo_hashes = fetch_firewall_rules("hashes") or "# Erro ao obter lista de hashes"
-        col_exp_btn, col_exp_code = st.columns([1, 2])
-
-        with col_exp_btn:
-            st.download_button(
-                label="📥 Baixar Lista de Hashes (malware_hashes.txt)",
-                data=conteudo_hashes,
-                file_name="malware_hashes.txt",
-                mime="text/plain",
-                use_container_width=True,
-                type="primary",
-                key="btn_download_malware_hashes_tab"
-            )
-            st.markdown("""
-            **Aplicações Práticas:**
-            * Bloqueio preventivo de execução de binários em estações e servidores.
-            * Criação de regras de detecção YARA customizadas.
-            * Ingestão em SIEM / SOAR para caça a ameaças (*Threat Hunting*).
-            """)
-
-        with col_exp_code:
-            st.code(conteudo_hashes, language="text", line_numbers=True)
 
 # ==============================================================================
 # ABA 4: CHATBOT INVESTIGATIVO FORENSE (RAG SOC)
@@ -754,6 +727,6 @@ with tab_grafana:
         st.link_button("↗️ Abrir Grafana em Nova Aba", grafana_url_input, use_container_width=True)
 
     try:
-        components.iframe(grafana_url_input, height=820, scrolling=True)
+        components.iframe(grafana_url_input, height=950, scrolling=True)
     except Exception as e:
         st.error(f"Não foi possível carregar o iframe do Grafana: {e}")

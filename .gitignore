@@ -26,4 +26,6 @@ grafana_data/plugins/
 grafana_data/csv/
 grafana_data/png/
 grafana_data/pdf/
+grafana_data/*.db-journal
 cowrie/var/log/cowrie/cowrie.json
+scratch/

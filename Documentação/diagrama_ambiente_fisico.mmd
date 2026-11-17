@@ -1,0 +1,80 @@
+flowchart LR
+    %% ========================================================
+    %% DIAGRAMA ARQUITETURAL: AMBIENTE FÍSICO COM HARDWARE DE BORDA
+    %% Projeto TCC - Cyber Threat Intelligence & Autonomous SOC
+    %% ========================================================
+
+    subgraph AMEACAS["1. Superfície de Ameaças"]
+        ATTACKER["👤 Atacante / Botnets<br/><i>(Mirai, Mozi, Força Bruta)</i>"]
+    end
+
+    subgraph EDGE["2. Hardware de Borda (Raspberry Pi 4 - 100.127.31.12)"]
+        PORT_22["🌐 Porta Pública 22<br/><i>(Roteador / NAT)</i>"]
+        COWRIE["🍯 Cowrie Honeypot (:2222)<br/><i>(Contêiner Docker - Emulador SSH)</i>"]
+        COWRIE_LOG[("📄 cowrie.json<br/><i>/var/log/cowrie/cowrie.json</i>")]
+        PROMTAIL_EDGE["📦 Promtail Edge<br/><i>(Shipper Docker na Borda)</i>"]
+        SSH_ADMIN["🛡️ SSH Administrativo Real<br/><i>Porta 50022 (Ofuscada / UFW)</i>"]
+    end
+
+    subgraph VPN["3. Camada de Transporte"]
+        TAILSCALE["🔒 Tailscale Mesh VPN<br/><i>(WireGuard Ponto-a-Ponto - 100.x.x.x)</i>"]
+    end
+
+    subgraph HOST["4. Host Central: SOC & IA (100.104.128.9)"]
+        subgraph OBS["Observabilidade & Telemetria"]
+            LOKI["🔥 Grafana Loki (:3100)<br/><i>Agregador de Logs</i>"]
+            GRAFANA["📊 Grafana (:3000)<br/><i>Alertas LogQL (0s Delay)</i>"]
+        end
+
+        subgraph CORE["Orquestrador & LLMOps"]
+            API["⚡ FastAPI Orchestrator (:5000)<br/><i>alerts-api / GeoIP / ASN</i>"]
+            CHROMA[("🧠 ChromaDB (:8000)<br/><i>Vector Store (RAG Persistido)</i>")]
+            OLLAMA["🦙 Ollama Local (:11434)<br/><i>Llama 3.2 + nomic-embed-text</i>"]
+            SOAR["🛡️ Defesa Perimetral (SOAR)<br/><i>Regras UFW & Malware Hashes</i>"]
+        end
+    end
+
+    subgraph SOC["5. Interfaces do Operador"]
+        TELEGRAM["✈️ Telegram Bot<br/><i>Alertas Críticos Mobile</i>"]
+        STREAMLIT["🖥️ Streamlit SOC Dashboard (:8501)<br/><i>• 1. Feed Tático GeoIP<br/>• 2. IoCs & Defesa Ativa UFW<br/>• 3. Malware Intel VirusTotal<br/>• 4. RAG Chatbot Investigativo<br/>• 5. Grafana Observability (Iframe)</i>"]
+    end
+
+    %% Conexões Ofensivas e Borda
+    ATTACKER -->|"Tentativa de Invasão (SSH 22)"| PORT_22
+    PORT_22 -->|"Redirecionamento"| COWRIE
+    COWRIE -->|"Grava Sessão e Comandos"| COWRIE_LOG
+    COWRIE_LOG -->|"Leitura Contínua"| PROMTAIL_EDGE
+
+    %% Transporte Seguro
+    PROMTAIL_EDGE -->|"Push Seguro de Logs"| TAILSCALE
+    TAILSCALE -->|"Túnel Criptografado WireGuard"| LOKI
+
+    %% Observabilidade e Alertas
+    LOKI -->|"Consulta LogQL"| GRAFANA
+    GRAFANA -->|"Webhook HTTP POST (/webhook)"| API
+
+    %% Pipeline Cognitivo e Memória RAG
+    API <-->|"Embeddings & Busca Semântica"| CHROMA
+    API <-->|"Prompt & Análise Forense"| OLLAMA
+
+    %% Resposta Ativa & Defesa Perimetral
+    API -->|"Gera Regras de Bloqueio"| SOAR
+    SOAR -.->|"Aplica Regras UFW no Edge via VPN"| SSH_ADMIN
+
+    %% Interfaces de Consumo
+    API -->|"Notificação Push Imediata"| TELEGRAM
+    API <-->|"Consumo de Alertas & Chat RAG"| STREAMLIT
+    GRAFANA -.->|"Painel de Métricas (Iframe)"| STREAMLIT
+
+    %% Estilização Visual
+    classDef attackerClass fill:#fee2e2,stroke:#ef4444,stroke-width:2px,color:#991b1b;
+    classDef edgeClass fill:#fff1f2,stroke:#e11d48,stroke-width:2px,color:#881337;
+    classDef vpnClass fill:#f0fdfa,stroke:#0d9488,stroke-width:2px,color:#134e4a;
+    classDef hostClass fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e3a8a;
+    classDef uiClass fill:#faf5ff,stroke:#7c3aed,stroke-width:2px,color:#4c1d95;
+
+    class ATTACKER attackerClass;
+    class PORT_22,COWRIE,COWRIE_LOG,PROMTAIL_EDGE,SSH_ADMIN edgeClass;
+    class TAILSCALE vpnClass;
+    class LOKI,GRAFANA,API,CHROMA,OLLAMA,SOAR hostClass;
+    class TELEGRAM,STREAMLIT uiClass;

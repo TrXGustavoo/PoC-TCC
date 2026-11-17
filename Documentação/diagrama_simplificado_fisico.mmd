@@ -1,0 +1,69 @@
+flowchart LR
+    %% ========================================================
+    %% DIAGRAMA SIMPLIFICADO: AMBIENTE FÍSICO (TCC)
+    %% Baseado no esboço com as devidas correções arquiteturais
+    %% ========================================================
+
+    %% 1. ENTRADA DE AMEAÇA
+    ATTACKER["👤 Atacante /<br/>Botnet IoT"]
+
+    %% 2. HARDWARE DE BORDA (RASPBERRY PI)
+    subgraph PI["🍓 Raspberry Pi (Ambiente Físico)"]
+        direction TB
+        COWRIE["🍯 Cowrie Honeypot<br/><i>(Porta 2222 / Docker)</i>"]
+        PROMTAIL["📦 Promtail Edge<br/><i>(Coletor de Logs)</i>"]
+        COWRIE -->|"Grava cowrie.json"| PROMTAIL
+    end
+
+    %% 3. PIPELINE DE OBSERVABILIDADE
+    LOKI["🔥 Loki<br/><i>(:3100)</i>"]
+    GRAFANA["📊 Grafana<br/><i>(:3000)</i>"]
+    ALERTA["⚠️ Alerta<br/><i>(Regra LogQL)</i>"]
+
+    %% 4. FRONTEND STREAMLIT & USUÁRIO
+    STREAMLIT["🖥️ Frontend Streamlit<br/><i>(Porta 8501)</i>"]
+    USER["👤 Analista SOC<br/><i>Pergunta do Usuário (Chat)</i>"]
+
+    %% 5. NÚCLEO DA API (FASTAPI)
+    API["⚡ API FastAPI<br/><i>(:5000 alerts-api)</i>"]
+
+    %% 6. COMPONENTES CONECTADOS À API
+    CHROMA[("🧠 ChromaDB<br/><i>(:8000 RAG Store)</i>")]
+    LLM["🦙 LLM Local<br/><i>Ollama Llama 3.2 (:11434)</i>"]
+    TELEGRAM["✈️ Telegram<br/><i>(Alertas Mobile)</i>"]
+
+    %% ========================================================
+    %% RELAÇÕES E CONEXÕES
+    %% ========================================================
+    ATTACKER -->|"Porta 22 SSH"| COWRIE
+    PROMTAIL -->|"Túnel VPN (Tailscale)"| LOKI
+    LOKI -->|"Logs"| GRAFANA
+    GRAFANA -->|"Avaliação"| ALERTA
+    ALERTA -->|"Webhook POST"| API
+
+    %% Conexões com IA e Notificações
+    API <-->|"Armazena Contexto (Embeddings)"| CHROMA
+    API <-->|"Análise / Prompt Forense"| LLM
+    API -->|"Alertas Críticos"| TELEGRAM
+
+    %% Conexões com o Frontend e Usuário
+    GRAFANA -.->|"Iframe (Logs & Métricas)"| STREAMLIT
+    USER <-->|"Chat Investigativo"| STREAMLIT
+    STREAMLIT <-->|"REST API (/alerts, /chat)"| API
+
+    %% ========================================================
+    %% ESTILIZAÇÃO
+    %% ========================================================
+    classDef attacker fill:#fee2e2,stroke:#ef4444,stroke-width:2px,color:#991b1b;
+    classDef piBox fill:#fff1f2,stroke:#e11d48,stroke-width:2px,color:#881337;
+    classDef obs fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#9a3412;
+    classDef ui fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e3a8a;
+    classDef apiBox fill:#f0f9ff,stroke:#0284c7,stroke-width:2px,color:#0369a1;
+    classDef ai fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+
+    class ATTACKER attacker;
+    class COWRIE,PROMTAIL piBox;
+    class LOKI,GRAFANA,ALERTA obs;
+    class STREAMLIT,USER ui;
+    class API,TELEGRAM apiBox;
+    class CHROMA,LLM ai;

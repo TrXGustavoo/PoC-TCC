@@ -16,7 +16,7 @@ banco_de_alertas = []
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_URL", "http://ollama_tcc:11434/api") # Base para todos os modelos
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2") 
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b") 
 LOKI_BASE_URL = os.getenv("LOKI_URL", "http://loki:3100") 
 
 # 🆕 --- INICIALIZAÇÃO RESILIENTE DO BANCO VETORIAL (CHROMA) ---
@@ -148,7 +148,14 @@ def analisar_com_ia_local(dados_alerta):
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": prompt,
-        "stream": False
+        "stream": False,
+        "options": {
+            "num_gpu": 0,
+            "num_ctx": 1024,
+            "num_predict": 200,
+            "num_thread": 8,
+            "temperature": 0.2
+        }
     }
     
     try:
@@ -164,7 +171,10 @@ def gerar_embedding(texto):
     url_embed = f"{OLLAMA_BASE_URL}/embeddings"
     payload = {
         "model": "nomic-embed-text",
-        "prompt": texto
+        "prompt": texto,
+        "options": {
+            "num_gpu": 0
+        }
     }
     try:
         resposta = requests.post(url_embed, json=payload, timeout=60)
@@ -189,6 +199,11 @@ async def recebe_alerta(request: Request):
         ip_atacante = labels.get("src_ip", "N/A")
         sessao = labels.get("session", "N/A")
         evento = labels.get("eventid", "N/A")
+        alertname = labels.get("alertname", "Alerta SOC")
+        mitre_tech = labels.get("mitre_technique", "")
+        severidade_label = labels.get("severity", "")
+        if mitre_tech and mitre_tech not in evento:
+            evento = f"{evento} [{mitre_tech}]"
         data_hora = alerta_atual.get("startsAt", "N/A")[:19]
         
         relatorio_ia = analisar_com_ia_local(alerta_atual)
@@ -241,21 +256,33 @@ async def recebe_alerta(request: Request):
             }
         }
         banco_de_alertas.insert(0, alerta_para_frontend)
-        if len(banco_de_alertas) > 50:
+        if len(banco_de_alertas) > 2000:
             banco_de_alertas.pop()
         
-        # --- FILTRO DE EVENTOS CRÍTICOS PARA O TELEGRAM ---
-        eventos_criticos = [
-            "cowrie.command.input",        
-            "cowrie.login.success",        
-            "cowrie.session.file_download" 
-        ]
+        # --- FILTRO INTELIGENTE POR SEVERIDADE PARA O TELEGRAM ---
+        eventos_criticos = (
+            "cowrie.command.input",
+            "cowrie.login.success",
+            "cowrie.session.file_download",
+            "cowrie.direct-tcpip"
+        )
+        eh_volumetrico = (
+            "cowrie.login.failed" in evento
+            or "cowrie.session.connect" in evento
+            or "Força Bruta" in alertname
+            or "Flood" in alertname
+        )
+        eh_critico = (
+            any(k in evento for k in eventos_criticos)
+            or severidade_label in ("critical", "high")
+        ) and not eh_volumetrico
         
-        if evento in eventos_criticos:
+        if eh_critico:
             mensagem_final = (
                 "🚨 *HONEYPOT: RELATÓRIO DE THREAT INTELLIGENCE* 🚨\n\n"
                 "💻 *DADOS DO ATAQUE (TELEMETRIA):*\n"
                 "```text\n"
+                f"Regra: {alertname}\n"
                 f"Data/Hora: {data_hora}Z\n"
                 f"Evento: {evento}\n"
                 f"IP Origem: {ip_atacante}\n"
@@ -267,65 +294,89 @@ async def recebe_alerta(request: Request):
                 f"{relatorio_limpo}"
             )
             enviar_telegram(mensagem_final)
-            print(f"🔥 Alerta crítico ({evento}) de {geo_info['pais']} enviado ao Telegram.")
         else:
-            print(f"ℹ️ Evento informativo ({evento}) registrado apenas no Frontend.")
+            print(f"ℹ️ Alerta volumétrico/informativo ({alertname} / {evento}) registrado apenas no Frontend.")
 
+        global _cache_iocs
+        _cache_iocs = None
         return {"status": "Processado"}
     
     return {"status": "Ignorado"}
 
+historico_chroma_carregado = False
+
+def sincronizar_com_chromadb():
+    global banco_de_alertas, historico_chroma_carregado
+    col = get_collection()
+    if not col:
+        return
+    try:
+        total_chroma = col.count()
+        dados = col.get(limit=max(total_chroma, 1000))
+        if dados and dados.get("documents"):
+            doc_ids = dados.get("ids", [])
+            docs = dados["documents"]
+            metas = dados.get("metadatas", [])
+            alertas_recuperados = []
+            
+            chaves_existentes = {
+                a.get("id") or (a.get("timestamp"), a.get("raw_data", {}).get("ip_origem"), a.get("raw_data", {}).get("sessao"))
+                for a in banco_de_alertas
+            }
+            
+            for doc_id, doc, meta in zip(doc_ids, docs, metas):
+                meta = meta or {}
+                if doc_id in chaves_existentes:
+                    continue
+                chaves_existentes.add(doc_id)
+
+                partes = doc.split("\nAnálise da IA: ")
+                cabecalho = partes[0]
+                analise = partes[1] if len(partes) > 1 else doc
+                
+                sessao = "N/A"
+                if "Sessão: " in cabecalho:
+                    sessao = cabecalho.split("Sessão: ")[-1].strip()
+                    
+                ip_val = meta.get("ip", "N/A")
+                ts_val = meta.get("timestamp", "N/A")
+                if ts_val != "N/A" and not ts_val.endswith("Z"):
+                    ts_val += "Z"
+
+                geo_cached = {
+                    "pais": meta.get("pais"),
+                    "codigo_pais": meta.get("codigo_pais", ""),
+                    "bandeira": meta.get("bandeira", "🌐"),
+                    "cidade": meta.get("cidade", ""),
+                    "lat": meta.get("lat", 0.0),
+                    "lon": meta.get("lon", 0.0),
+                    "isp": meta.get("isp", "")
+                } if meta.get("pais") else obter_geoip(ip_val)
+
+                alertas_recuperados.append({
+                    "id": doc_id,
+                    "timestamp": ts_val,
+                    "ai_analysis": analise,
+                    "raw_data": {
+                        "evento": meta.get("evento", "N/A"),
+                        "ip_origem": ip_val,
+                        "sessao": sessao,
+                        "geo": geo_cached
+                    }
+                })
+            
+            banco_de_alertas.extend(alertas_recuperados)
+            banco_de_alertas.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+            historico_chroma_carregado = True
+            print(f"🔄 Sincronizados {len(banco_de_alertas)} alertas consolidados (ChromaDB + RAM) para o Frontend!")
+    except Exception as e:
+        print(f"❌ Erro ao sincronizar histórico do ChromaDB: {e}")
+
 @app.get("/alerts")
 async def retorna_alertas():
-    global banco_de_alertas
-    # Se a lista em RAM estiver vazia (ex: após reiniciar o container), recupera do ChromaDB
-    if not banco_de_alertas:
-        col = get_collection()
-        if col:
-            try:
-                dados = col.get(limit=50)
-                if dados and dados.get("documents"):
-                    docs = dados["documents"]
-                    metas = dados.get("metadatas", [])
-                    alertas_recuperados = []
-                    for doc, meta in zip(docs, metas):
-                        meta = meta or {}
-                        partes = doc.split("\nAnálise da IA: ")
-                        cabecalho = partes[0]
-                        analise = partes[1] if len(partes) > 1 else doc
-                        
-                        sessao = "N/A"
-                        if "Sessão: " in cabecalho:
-                            sessao = cabecalho.split("Sessão: ")[-1].strip()
-                            
-                        ip_val = meta.get("ip", "N/A")
-                        geo_cached = {
-                            "pais": meta.get("pais"),
-                            "codigo_pais": meta.get("codigo_pais", ""),
-                            "bandeira": meta.get("bandeira", "🌐"),
-                            "cidade": meta.get("cidade", ""),
-                            "lat": meta.get("lat", 0.0),
-                            "lon": meta.get("lon", 0.0),
-                            "isp": meta.get("isp", "")
-                        } if meta.get("pais") else obter_geoip(ip_val)
-
-                        alertas_recuperados.append({
-                            "timestamp": meta.get("timestamp", "N/A") + ("Z" if not meta.get("timestamp", "").endswith("Z") else ""),
-                            "ai_analysis": analise,
-                            "raw_data": {
-                                "evento": meta.get("evento", "N/A"),
-                                "ip_origem": ip_val,
-                                "sessao": sessao,
-                                "geo": geo_cached
-                            }
-                        })
-                    
-                    # Ordena do mais recente para o mais antigo
-                    alertas_recuperados.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
-                    banco_de_alertas = alertas_recuperados
-                    print(f"🔄 Recuperados {len(banco_de_alertas)} alertas históricos do ChromaDB para o Frontend!")
-            except Exception as e:
-                print(f"❌ Erro ao recuperar histórico do ChromaDB: {e}")
+    global banco_de_alertas, historico_chroma_carregado
+    if not historico_chroma_carregado or len(banco_de_alertas) < 30:
+        sincronizar_com_chromadb()
 
     return {
         "total": len(banco_de_alertas),
@@ -348,46 +399,84 @@ async def chat_rag(request: Request):
     if not vetor_pergunta:
         return {"resposta": "Erro ao vetorizar a pergunta."}
         
-    # 2. Busca na memória profunda (ChromaDB)
+    # 2. Busca Híbrida (Filtro Semântico no ChromaDB + Correspondência Direta por IP/País/Recência)
+    if not historico_chroma_carregado or len(banco_de_alertas) < 30:
+        sincronizar_com_chromadb()
+
+    blocos_contexto = []
+    p_lower = pergunta.lower()
+
+    # 2A. Verifica correspondência exata de IP, País ou pedido de mais recentes na memória ordenada
+    for a in banco_de_alertas:
+        raw = a.get("raw_data", {})
+        ip_a = str(raw.get("ip_origem", ""))
+        pais_a = str(raw.get("geo", {}).get("pais", ""))
+        ev_a = str(raw.get("evento", ""))
+        if (ip_a and ip_a not in ("N/A", "Desconhecido") and ip_a in pergunta) or (
+            pais_a and pais_a not in ("N/A", "Desconhecido", "Rede Interna") and pais_a.lower() in p_lower
+        ):
+            resumo_curto = str(a.get("ai_analysis", ""))[:350]
+            blocos_contexto.append(
+                f"Data: {a.get('timestamp')} | Evento: {ev_a} | IP: {ip_a} ({pais_a}) | Sessão: {raw.get('sessao')}\nAnálise: {resumo_curto}"
+            )
+            if len(blocos_contexto) >= 3:
+                break
+
+    if not blocos_contexto and any(k in p_lower for k in ("recente", "último", "ultimo", "hoje", "agora")):
+        for a in banco_de_alertas[:3]:
+            raw = a.get("raw_data", {})
+            ip_a = str(raw.get("ip_origem", ""))
+            pais_a = str(raw.get("geo", {}).get("pais", ""))
+            ev_a = str(raw.get("evento", ""))
+            resumo_curto = str(a.get("ai_analysis", ""))[:350]
+            blocos_contexto.append(
+                f"Data: {a.get('timestamp')} | Evento: {ev_a} | IP: {ip_a} ({pais_a}) | Sessão: {raw.get('sessao')}\nAnálise: {resumo_curto}"
+            )
+
+    # 2B. Complementa com Busca Vetorial Semântica (ChromaDB)
     col = get_collection()
-    if not col:
-        contexto_historico = "Banco vetorial ChromaDB temporariamente indisponível."
-    else:
+    if col and len(blocos_contexto) < 3:
         try:
             total_docs = col.count()
-            if total_docs == 0:
-                contexto_historico = "Nenhum histórico de ataque encontrado no banco vetorial."
-            else:
-                n_results = min(3, total_docs)
+            if total_docs > 0:
+                faltam = 3 - len(blocos_contexto)
                 resultados = col.query(
                     query_embeddings=[vetor_pergunta],
-                    n_results=n_results
+                    n_results=min(faltam, total_docs)
                 )
-                contexto_historico = "\n\n---\n\n".join(resultados["documents"][0]) if resultados.get("documents") and resultados["documents"][0] else "Nenhum histórico relevante encontrado."
+                if resultados.get("documents") and resultados["documents"][0]:
+                    for doc in resultados["documents"][0]:
+                        blocos_contexto.append(doc[:450])
         except Exception as e:
             print(f"❌ Erro ao consultar ChromaDB: {e}")
-            contexto_historico = f"Erro na consulta à base vetorial: {e}"
-    
-    # 3. Manda a pergunta e o passado para o Llama 3
-    prompt_rag = f"""
-    DADOS FORENSES REGISTRADOS NOS LOGS:
-    {contexto_historico}
-    
-    CONSULTA DE AUDITORIA:
-    {pergunta}
-    
-    Responda à consulta transcrevendo e explicando os dados contidos nos logs acima (IPs, eventos, comandos e horários).
-    """
-    
+
+    contexto_historico = "\n\n---\n\n".join(blocos_contexto) if blocos_contexto else "Nenhum histórico relevante encontrado."
+
+    # 3. Envia a pergunta e o contexto recuperado para o Qwen 2.5 (3B)
+    prompt_rag = f"""DADOS FORENSES REGISTRADOS NOS LOGS:
+{contexto_historico}
+
+CONSULTA DE AUDITORIA:
+{pergunta}
+
+Responda objetivamente em português com base nos logs acima (citando IPs, país, eventos, sessões e horários)."""
+
     payload = {
         "model": OLLAMA_MODEL,
-        "system": "Você é um assistente técnico especializado em auditoria e sumarização de dados de logs sintéticos de laboratório. Sua tarefa é responder perguntas objetivas sobre o histórico de logs fornecido, citando fatos, comandos e endereços registrados.",
+        "system": "Você é um analista de SOC especialista em Threat Intelligence. Responda de forma direta, técnica e concisa com base nos logs fornecidos.",
         "prompt": prompt_rag,
-        "stream": False
+        "stream": False,
+        "options": {
+            "num_gpu": 0,
+            "num_ctx": 1024,
+            "num_predict": 240,
+            "num_thread": 8,
+            "temperature": 0.2
+        }
     }
     
     try:
-        resposta = requests.post(f"{OLLAMA_BASE_URL}/generate", json=payload, timeout=120)
+        resposta = requests.post(f"{OLLAMA_BASE_URL}/generate", json=payload, timeout=40)
         if resposta.status_code == 200:
             return {"resposta": resposta.json().get("response", "Erro na geração da IA.")}
     except Exception as e:
@@ -477,11 +566,21 @@ def classificar_malware(nome_ou_url: str, destfile: str = "") -> dict:
         "arquitetura": arq
     }
 
-def extrair_iocs():
+_cache_iocs = None
+_cache_iocs_timestamp = 0.0
+
+
+def extrair_iocs(force_refresh: bool = False):
     """
     Extrai e correlaciona Indicadores de Comprometimento (IoCs)
     a partir do Grafana Loki e da base histórica do ChromaDB / banco_de_alertas.
+    Utiliza cache em memória de 15 segundos para aceleração extrema de requisições.
     """
+    global _cache_iocs, _cache_iocs_timestamp
+    agora_ts = time.time()
+    if not force_refresh and _cache_iocs is not None and (agora_ts - _cache_iocs_timestamp) < 15:
+        return _cache_iocs
+
     ips_dict = {}
     credenciais_dict = {}
     comandos_lista = []
@@ -647,6 +746,9 @@ def extrair_iocs():
         print(f"⚠️ Aviso ao extrair IoCs do Loki: {e}")
 
     # 2. Mescla com os alertas conhecidos em memória e ChromaDB
+    if not historico_chroma_carregado or len(banco_de_alertas) < 30:
+        sincronizar_com_chromadb()
+
     for a in banco_de_alertas:
         raw = a.get("raw_data", {})
         ip = raw.get("ip_origem")
@@ -779,7 +881,7 @@ def extrair_iocs():
         })
     malwares_formatados.sort(key=lambda x: x["timestamp"], reverse=True)
 
-    return {
+    resultado = {
         "total_ips": len(ips_formatados),
         "ips": ips_formatados,
         "total_credentials": len(creds_formatadas),
@@ -789,6 +891,10 @@ def extrair_iocs():
         "total_malwares": len(malwares_formatados),
         "malwares": malwares_formatados
     }
+    _cache_iocs = resultado
+    _cache_iocs_timestamp = time.time()
+    return resultado
+
 
 
 def gerar_regras_firewall(formato: str = "ufw") -> str:
@@ -872,9 +978,10 @@ def gerar_regras_firewall(formato: str = "ufw") -> str:
 
 
 @app.get("/iocs")
-async def obter_iocs():
+async def obter_iocs(refresh: bool = False):
     """Retorna a base agregada de Indicadores de Comprometimento (IoCs)."""
-    return extrair_iocs()
+    return extrair_iocs(force_refresh=refresh)
+
 
 
 @app.get("/export/firewall")

@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" style="background:#ffffff; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+    <filter id="card-shadow" x="-4%" y="-4%" width="108%" height="112%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.05" />
+    </filter>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#334155" />
+    </linearGradient>
+    <linearGradient id="lokiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c" />
+      <stop offset="100%" stop-color="#c2410c" />
+    </linearGradient>
+    <linearGradient id="grafanaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="apiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <linearGradient id="ollamaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#4338ca" />
+    </linearGradient>
+    <linearGradient id="tgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="stGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e11d48" />
+      <stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#475569" />
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284c7" />
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#ea580c" />
+    </marker>
+  </defs>
+
+  <!-- Borda Externa & Fundo -->
+  <rect x="15" y="15" width="1250" height="690" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2" filter="url(#shadow)" />
+
+  <!-- Cabeçalho -->
+  <rect x="15" y="15" width="1250" height="60" rx="16" fill="url(#headerGrad)" />
+  <rect x="15" y="55" width="1250" height="20" fill="url(#headerGrad)" />
+  <text x="40" y="50" fill="#ffffff" font-size="20" font-weight="700">ARQUITETURA VIRTUALIZADA: PROVA DE CONCEITO (TCC 1 - AMBIENTE DIGITAL)</text>
+  <text x="1230" y="50" fill="#94a3b8" font-size="13" text-anchor="end" font-weight="500">Validação em Contêineres Docker (Sem Hardware Físico)</text>
+
+  <!-- ========================================== -->
+  <!-- GRUPO 1: SIMULAÇÃO DA TELEMETRIA -->
+  <!-- ========================================== -->
+  <rect x="40" y="110" width="220" height="540" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#card-shadow)" />
+  <rect x="40" y="110" width="220" height="38" rx="12" fill="#e2e8f0" />
+  <rect x="40" y="136" width="220" height="12" fill="#e2e8f0" />
+  <text x="150" y="134" fill="#334155" font-size="13" font-weight="700" text-anchor="middle">1. SIMULAÇÃO DA TELEMETRIA</text>
+
+  <!-- Card Kaggle Dataset -->
+  <rect x="60" y="240" width="180" height="260" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" />
+  <circle cx="150" cy="300" r="32" fill="#0284c7" />
+  <text x="150" y="312" fill="#ffffff" font-size="34" font-weight="900" text-anchor="middle">k</text>
+  <text x="150" y="360" fill="#0f172a" font-size="15" font-weight="700" text-anchor="middle">Dataset de Invasão</text>
+  <text x="150" y="380" fill="#475569" font-size="12" text-anchor="middle">Kaggle / Logs Reais Cowrie</text>
+  <rect x="75" y="405" width="150" height="24" rx="4" fill="#e2e8f0" />
+  <text x="150" y="421" fill="#334155" font-size="11" font-family="monospace" text-anchor="middle">kaggle_logs.json</text>
+  <text x="150" y="455" fill="#64748b" font-size="11" text-anchor="middle">Simulação de sessões SSH,</text>
+  <text x="150" y="470" fill="#64748b" font-size="11" text-anchor="middle">força bruta e comandos</text>
+
+  <!-- ========================================== -->
+  <!-- GRUPO 2: PIPELINE DE OBSERVABILIDADE (HOST) -->
+  <!-- ========================================== -->
+  <rect x="300" y="110" width="310" height="540" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#card-shadow)" />
+  <rect x="300" y="110" width="310" height="38" rx="12" fill="#e2e8f0" />
+  <rect x="300" y="136" width="310" height="12" fill="#e2e8f0" />
+  <text x="455" y="134" fill="#334155" font-size="13" font-weight="700" text-anchor="middle">2. PIPELINE DE OBSERVABILIDADE</text>
+
+  <!-- Promtail -->
+  <rect x="325" y="170" width="260" height="110" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <rect x="340" y="185" width="40" height="40" rx="8" fill="#ea580c" />
+  <text x="360" y="210" fill="#ffffff" font-size="20" font-weight="bold" text-anchor="middle">P</text>
+  <text x="395" y="202" fill="#0f172a" font-size="15" font-weight="700">Promtail</text>
+  <text x="395" y="218" fill="#64748b" font-size="11">Agente de Coleta de Logs</text>
+  <text x="340" y="255" fill="#475569" font-size="11">• Leitura contínua do arquivo JSON</text>
+  <text x="340" y="270" fill="#475569" font-size="11">• Ingestão local via Docker</text>
+
+  <!-- Loki -->
+  <rect x="325" y="325" width="260" height="120" rx="8" fill="#f8fafc" stroke="#ea580c" stroke-width="1.5" />
+  <rect x="340" y="340" width="40" height="40" rx="8" fill="url(#lokiGrad)" />
+  <text x="360" y="365" fill="#ffffff" font-size="20" font-weight="bold" text-anchor="middle">L</text>
+  <text x="395" y="357" fill="#0f172a" font-size="15" font-weight="700">Grafana Loki</text>
+  <rect x="525" y="342" width="50" height="18" rx="4" fill="#ffedd5" stroke="#fed7aa" />
+  <text x="550" y="355" fill="#c2410c" font-size="10" font-weight="bold" text-anchor="middle">:3100</text>
+  <text x="395" y="373" fill="#64748b" font-size="11">Agregador Central de Logs</text>
+  <text x="340" y="410" fill="#475569" font-size="11">• Indexação por labels {job="honeypot"}</text>
+  <text x="340" y="425" fill="#475569" font-size="11">• Séries temporais de telemetria</text>
+
+  <!-- Grafana -->
+  <rect x="325" y="490" width="260" height="135" rx="8" fill="#f8fafc" stroke="#f59e0b" stroke-width="1.5" />
+  <rect x="340" y="505" width="40" height="40" rx="8" fill="url(#grafanaGrad)" />
+  <text x="360" y="530" fill="#ffffff" font-size="20" font-weight="bold" text-anchor="middle">G</text>
+  <text x="395" y="522" fill="#0f172a" font-size="15" font-weight="700">Grafana</text>
+  <rect x="525" y="507" width="50" height="18" rx="4" fill="#fef3c7" stroke="#fde68a" />
+  <text x="550" y="520" fill="#b45309" font-size="10" font-weight="bold" text-anchor="middle">:3000</text>
+  <text x="395" y="538" fill="#64748b" font-size="11">Dashboards &amp; Alertas</text>
+  <text x="340" y="575" fill="#475569" font-size="11">• Consultas LogQL em tempo real</text>
+  <text x="340" y="590" fill="#475569" font-size="11">• Regras de Alerta (Login, Comandos)</text>
+  <text x="340" y="605" fill="#c2410c" font-size="11" font-weight="bold">• Disparo imediato (Pending: 0s)</text>
+
+  <!-- ========================================== -->
+  <!-- GRUPO 3: BACKEND & IA GENERATIVA -->
+  <!-- ========================================== -->
+  <rect x="650" y="110" width="310" height="540" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#card-shadow)" />
+  <rect x="650" y="110" width="310" height="38" rx="12" fill="#e2e8f0" />
+  <rect x="650" y="136" width="310" height="12" fill="#e2e8f0" />
+  <text x="805" y="134" fill="#334155" font-size="13" font-weight="700" text-anchor="middle">3. PROCESSAMENTO &amp; IA GENERATIVA</text>
+
+  <!-- FastAPI (alerts-api) -->
+  <rect x="675" y="170" width="260" height="190" rx="8" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5" />
+  <rect x="690" y="185" width="40" height="40" rx="8" fill="url(#apiGrad)" />
+  <text x="710" y="210" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">API</text>
+  <text x="745" y="202" fill="#0f172a" font-size="15" font-weight="700">FastAPI Orchestrator</text>
+  <rect x="875" y="187" width="50" height="18" rx="4" fill="#e0f2fe" stroke="#bae6fd" />
+  <text x="900" y="200" fill="#0369a1" font-size="10" font-weight="bold" text-anchor="middle">:5000</text>
+  <text x="745" y="218" fill="#64748b" font-size="11">alerts-api (Contêiner Docker)</text>
+  <text x="690" y="255" fill="#334155" font-size="11">• Recebe Webhook do Grafana (<tspan font-family="monospace">/webhook</tspan>)</text>
+  <text x="690" y="275" fill="#334155" font-size="11">• Normaliza telemetria de invasão</text>
+  <text x="690" y="295" fill="#334155" font-size="11">• Orquestra inferência da LLM</text>
+  <text x="690" y="315" fill="#334155" font-size="11">• Serve rotas para o frontend (<tspan font-family="monospace">/alerts</tspan>)</text>
+  <text x="690" y="335" fill="#0369a1" font-size="11" font-weight="bold">• Filtro de eventos críticos</text>
+
+  <!-- Ollama LLM -->
+  <rect x="675" y="410" width="260" height="215" rx="8" fill="#f8fafc" stroke="#4f46e5" stroke-width="1.5" />
+  <rect x="690" y="425" width="40" height="40" rx="8" fill="url(#ollamaGrad)" />
+  <text x="710" y="450" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">IA</text>
+  <text x="745" y="442" fill="#0f172a" font-size="15" font-weight="700">Ollama (Servidor Local)</text>
+  <rect x="875" y="427" width="50" height="18" rx="4" fill="#ede9fe" stroke="#ddd6fe" />
+  <text x="900" y="440" fill="#4338ca" font-size="10" font-weight="bold" text-anchor="middle">:11434</text>
+  <text x="745" y="458" fill="#64748b" font-size="11">Motor Cognitivo de IA</text>
+
+  <rect x="690" y="480" width="230" height="45" rx="6" fill="#eef2ff" stroke="#c7d2fe" />
+  <text x="700" y="498" fill="#312e81" font-size="12" font-weight="bold">Modelo: Llama 3.2</text>
+  <text x="700" y="514" fill="#4338ca" font-size="11">• Análise sintética do ataque</text>
+
+  <text x="690" y="550" fill="#334155" font-size="11">• Mapeamento MITRE ATT&amp;CK</text>
+  <text x="690" y="568" fill="#334155" font-size="11">• Avaliação de severidade do payload</text>
+  <text x="690" y="586" fill="#334155" font-size="11">• Recomendações de mitigação</text>
+  <text x="690" y="606" fill="#4338ca" font-size="10" font-style="italic">*Sem RAG na PoC inicial (apenas zero-shot)</text>
+
+  <!-- ========================================== -->
+  <!-- GRUPO 4: INTERFACES DE CONSUMO -->
+  <!-- ========================================== -->
+  <rect x="1000" y="110" width="240" height="540" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#card-shadow)" />
+  <rect x="1000" y="110" width="240" height="38" rx="12" fill="#e2e8f0" />
+  <rect x="1000" y="136" width="240" height="12" fill="#e2e8f0" />
+  <text x="1120" y="134" fill="#334155" font-size="13" font-weight="700" text-anchor="middle">4. INTERFACES DE CONSUMO</text>
+
+  <!-- Telegram -->
+  <rect x="1020" y="170" width="200" height="160" rx="8" fill="#f0f9ff" stroke="#0ea5e9" stroke-width="1.5" />
+  <circle cx="1120" cy="215" r="24" fill="url(#tgGrad)" />
+  <path d="M 1110 215 L 1130 205 L 1125 225 L 1118 220 L 1110 215" fill="#ffffff" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" />
+  <text x="1120" y="260" fill="#0f172a" font-size="14" font-weight="700" text-anchor="middle">Telegram Bot</text>
+  <text x="1120" y="278" fill="#0369a1" font-size="11" text-anchor="middle">Alertas Críticos Mobile</text>
+  <text x="1120" y="300" fill="#64748b" font-size="10" text-anchor="middle">Notificações com IP, evento,</text>
+  <text x="1120" y="315" fill="#64748b" font-size="10" text-anchor="middle">comando e relatório da IA</text>
+
+  <!-- Streamlit -->
+  <rect x="1020" y="380" width="200" height="245" rx="8" fill="#fff1f2" stroke="#e11d48" stroke-width="1.5" />
+  <rect x="1040" y="395" width="36" height="36" rx="6" fill="url(#stGrad)" />
+  <text x="1058" y="420" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">S</text>
+  <text x="1085" y="412" fill="#0f172a" font-size="14" font-weight="700">Streamlit</text>
+  <rect x="1165" y="397" width="45" height="18" rx="4" fill="#ffe4e6" stroke="#fecdd3" />
+  <text x="1187" y="410" fill="#be123c" font-size="10" font-weight="bold" text-anchor="middle">:8501</text>
+  <text x="1085" y="428" fill="#64748b" font-size="11">Dashboard Tático</text>
+  <text x="1035" y="465" fill="#334155" font-size="11">• Feed de Alertas Recentes</text>
+  <text x="1035" y="485" fill="#334155" font-size="11">• Relatórios Cognitivos da IA</text>
+  <text x="1035" y="505" fill="#334155" font-size="11">• Iframe do Grafana Embutido</text>
+  <text x="1035" y="525" fill="#334155" font-size="11">• Status de Saúde da API</text>
+  <rect x="1035" y="550" width="170" height="55" rx="4" fill="#ffffff" stroke="#f43f5e" stroke-width="1" />
+  <text x="1120" y="570" fill="#9f1239" font-size="10" font-weight="bold" text-anchor="middle">Acesso Unificado do SOC</text>
+  <text x="1120" y="588" fill="#64748b" font-size="10" text-anchor="middle">Visualização operacional</text>
+
+  <!-- ========================================== -->
+  <!-- CONEXÕES E SETAS -->
+  <!-- ========================================== -->
+  <!-- Kaggle -> Promtail -->
+  <path d="M 240 370 L 280 370 L 280 225 L 325 225" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="270" y="300" fill="#475569" font-size="10" font-weight="600" text-anchor="middle">Logs</text>
+
+  <!-- Promtail -> Loki -->
+  <path d="M 455 280 L 455 325" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)" />
+  <text x="495" y="305" fill="#c2410c" font-size="10" font-weight="600">HTTP Push</text>
+
+  <!-- Loki -> Grafana -->
+  <path d="M 455 445 L 455 490" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)" />
+  <text x="495" y="470" fill="#c2410c" font-size="10" font-weight="600">LogQL</text>
+
+  <!-- Grafana -> Webhook (API) -->
+  <path d="M 585 550 L 630 550 L 630 260 L 675 260" fill="none" stroke="#c2410c" stroke-width="2" marker-end="url(#arrow-orange)" />
+  <rect x="595" y="415" width="70" height="20" rx="4" fill="#ffedd5" stroke="#fed7aa" />
+  <text x="630" y="429" fill="#9a3412" font-size="10" font-weight="bold" text-anchor="middle">Webhook</text>
+
+  <!-- Grafana -> Streamlit (Iframe) -->
+  <path d="M 585 600 L 1020 600" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#arrow)" />
+  <text x="800" y="593" fill="#b45309" font-size="10" font-weight="600">Observabilidade Embutida (Iframe do Grafana)</text>
+
+  <!-- API <-> Ollama -->
+  <path d="M 770 360 L 770 410" fill="none" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 840 410 L 840 360" fill="none" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="805" y="388" fill="#4338ca" font-size="10" font-weight="bold" text-anchor="middle">Prompt / Resposta</text>
+
+  <!-- API -> Telegram -->
+  <path d="M 935 235 L 1020 235" fill="none" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)" />
+  <text x="975" y="225" fill="#0369a1" font-size="10" font-weight="bold" text-anchor="middle">Alertas</text>
+
+  <!-- API -> Streamlit -->
+  <path d="M 935 310 L 975 310 L 975 440 L 1020 440" fill="none" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)" />
+  <text x="965" y="380" fill="#0369a1" font-size="10" font-weight="bold" text-anchor="middle">/alerts</text>
+
+</svg>
